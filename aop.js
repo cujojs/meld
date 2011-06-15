@@ -1,3 +1,6 @@
+
+// TODO:
+// 1. Strategy for removing advice
 define([], function() {
 
 	function callAdvice(advices, target, args) {
@@ -109,5 +112,9 @@ define([], function() {
 		}
 	}
 	
+	// Public API
+	return {
+		add: advice
+	};
 
 });
