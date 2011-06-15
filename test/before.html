@@ -7,9 +7,66 @@
 	<script type="text/javascript" src="../aop.js"></script>
 	<script type="text/javascript">
 		(function(global, doh, aop, undef) {
+
+			var arg = "foo"; // const
+
+			function method(a) {
+				this.val++;
+			}
+						
+			function Fixture() { this.val = 0; }
+			
+			Fixture.prototype = {
+				method: method
+			};
+			
 			doh.register('before', [
 				function testBefore1() {
-					doh.assertTrue(aop != undef);
+					var target = new Fixture();
+					
+					aop.add(target, 'method', 'before', function before1(a) {
+						// this should be the advised object
+						doh.assertEqual(target, this);
+
+						// arg should not change
+						doh.assertEqual(arg, a);
+						
+						// before function should be called (duh) before
+						// the original, so val should not have changed yet.
+						doh.assertEqual(0, this.val);
+					});
+					
+					target.method(arg);
+					
+					// after method call, val should have changed
+					doh.assertEqual(1, target.val);
+				},
+				function testBefore2() {
+					var target = new Fixture();
+					
+					aop.add(target, 'method', 'before', function before1(a) {
+						doh.assertEqual(target, this);
+						doh.assertEqual(arg, a);
+
+						// *ALL* before functions should be called (duh) before
+						// the original, so val should not have changed yet.
+						doh.assertEqual(0, this.val);
+					});
+
+					aop.add(target, 'method', 'before', function before2(a) {
+						doh.assertEqual(target, this);
+						doh.assertEqual(arg, a);
+
+						// *ALL* before functions should be called (duh) before
+						// the original, so val should not have changed yet.
+						doh.assertEqual(0, this.val);
+					});
+					
+					target.method(arg);
+					
+					// original method should only have been called once, so
+					// val should only be 1.
+					doh.assertEqual(1, target.val);
 				}
 			]);
 

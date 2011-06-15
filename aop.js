@@ -3,29 +3,43 @@
 // 1. Strategy for removing advice
 (function(define, undef) {
 define([], function() {
+	
+	var ap, prepend, append, slice;
+	
+	ap      = Array.prototype;
+	prepend = ap.unshift;
+	append  = ap.push;
+	slice   = ap.slice;
+	
+	function argsToArray(a) {
+		return slice.call(a);
+	}
 
 	function callAdvice(advices, target, args) {
 		var i, advice;
 
-		i = advices.length;
-
-		while((advice = advices[--i])) {
+		i = 0;
+		
+		while((advice = advices[i++])) {
 			advice.apply(target, args);
 		}
 	}
 
-	function makeAdviceList(advices, order) {
-		return function(advice) {
-			order.call(advices, advice);
+	function makeAdviceAdd(advices, order) {
+		return function(adviceFunc) {
+			order.call(advices, adviceFunc);
 		};
 	}
-
-	function addAdvice(target, func, type, adviceFunc) {
+	
+	function getAdvisor(target, func) {
 		var advised = target[func];
 		
 		if(!advised._advisor) {
-			var before, afterReturning, afterThrowing, after, around, advisor, interceptor;
+			var orig, before, afterReturning, afterThrowing, after, around, advisor;
 
+			// Save the original, not-yet-advised function
+			orig = advised;
+			
 			before = [];
 			after  = [];
 			afterReturning  = [];
@@ -34,7 +48,7 @@ define([], function() {
 
 			// Intercept calls to the original function, and invoke
 			// all currently registered before, around, and after advices
-			interceptor = target[func] = function() {
+			advised = target[func] = function() {
 				var targetArgs, result, afterType;
 
 				targetArgs = argsToArray(arguments);
@@ -43,11 +57,13 @@ define([], function() {
 				// Befores
 				callAdvice(before, this, targetArgs);
 				
-				// Call around if registered.  If not call original
+				// Call around if registered.  If not, call original
 				try {
-					result = (around.advice||advised).apply(this, targetArgs);
+					result = (around.advice||orig).apply(this, targetArgs);
 
 				} catch(e) {
+					// If an exception was thrown, save it as the result,
+					// and switch to afterThrowing
 					result = e;
 					afterType = afterThrowing;
 
@@ -58,35 +74,43 @@ define([], function() {
 				// TODO: Is it correct to pass original arguments here or
 				// return result?  What if exception occurred?  Should result
 				// then be the exception?
+				
+				// Always call "after", regardless of success return or exception.
 				callAdvice(after, this, targetArgs);
 
 				return result;
 			};
 
-			interceptor._advisor = {
-				before: makeAdviceList(before, ap.unshift),
-				after:  makeAdviceList(after, ap.push),
-				afterReturning: makeAdviceList(afterReturning, ap.push),
-				afterThrowing:  makeAdviceList(afterThrowing, ap.push),
-				around: function(f) {
+			advised._advisor = {
+				before: makeAdviceAdd(before, prepend),
+				after:  makeAdviceAdd(after, append),
+				afterReturning: makeAdviceAdd(afterReturning, append),
+				afterThrowing:  makeAdviceAdd(afterThrowing, append),
+				around: function(adviceFunc) {
 					around.advice = function() {
 						var args, self;
 						args = argsToArray(arguments);
 						self = this;
 
 						function proceed() {
-							return advised.apply(self, args);
+							return orig.apply(self, args);
 						}
 
-						f.call(self, { args: args, target: self, proceed: proceed });
+						adviceFunc.call(self, { args: args, target: self, proceed: proceed });
 					};
 				}
-			};
+			};			
 		}
-
-		advised._advisor[type](adviceFunc);
-
+		
 		return advised._advisor;
+	}
+
+	function addAdvice(target, func, type, adviceFunc) {
+		var advisor = getAdvisor(target, func);
+
+		advisor[type](adviceFunc);
+
+		return advisor;
 	}
 	
 	function advice(object, func, advice, /* Optional */ adviceFunc) {
