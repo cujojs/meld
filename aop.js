@@ -1,6 +1,7 @@
 
 // TODO:
 // 1. Strategy for removing advice
+(function(define, undef) {
 define([], function() {
 
 	function callAdvice(advices, target, args) {
@@ -117,4 +118,8 @@ define([], function() {
 		add: advice
 	};
 
+});
+})(typeof define != 'undefined' ? define : function(deps, factory){
+    // global when, if not loaded via require
+    this.aop = factory();
 });

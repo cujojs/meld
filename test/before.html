@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>before Unit Tests</title>
+	<script type="text/javascript" src="util/doh/runner.js"></script>
+	<script type="text/javascript" src="../aop.js"></script>
+	<script type="text/javascript">
+		(function(global, doh, aop, undef) {
+			doh.register('before', [
+				function testBefore1() {
+					doh.assertTrue(aop != undef);
+				}
+			]);
+
+			doh.run();
+			
+		})(window, doh, aop);
+	</script>
+</head>
+<body>
+	
+</body>
+</html>
