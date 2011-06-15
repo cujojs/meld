@@ -35,7 +35,7 @@ define([], function() {
 		var advised = target[func];
 		
 		if(!advised._advisor) {
-			var orig, before, afterReturning, afterThrowing, after, around, advisor;
+			var orig, before, afterReturning, afterThrowing, after, around;
 
 			// Save the original, not-yet-advised function
 			orig = advised;
