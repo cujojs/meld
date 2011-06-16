@@ -1,6 +1,7 @@
 
 // TODO:
 // 1. Strategy for removing advice
+// 2. Provide access to advisor
 (function(define, undef) {
 define([], function() {
 	
@@ -42,8 +43,8 @@ define([], function() {
 			
 			before = [];
 			after  = [];
-			afterReturning  = [];
-			afterThrowing   = [];
+			afterReturning = [];
+			afterThrowing  = [];
 			around = {};
 
 			// Intercept calls to the original function, and invoke
@@ -82,18 +83,23 @@ define([], function() {
 			};
 
 			advised._advisor = {
-				before: makeAdviceAdd(before, prepend),
-				after:  makeAdviceAdd(after, append),
+				before:         makeAdviceAdd(before, prepend),
 				afterReturning: makeAdviceAdd(afterReturning, append),
 				afterThrowing:  makeAdviceAdd(afterThrowing, append),
+				after:          makeAdviceAdd(after, append),
 				around: function(adviceFunc) {
+					// Allow around "stacking" by wrapping existing around,
+					// if it exists.  If not, wrap orig method.
+					var aroundee = around.advice || orig;
+
 					around.advice = function() {
 						var args, self;
+						
 						args = argsToArray(arguments);
 						self = this;
 
 						function proceed() {
-							return orig.apply(self, args);
+							return aroundee.apply(self, args);
 						}
 
 						adviceFunc.call(self, { args: args, target: self, proceed: proceed });
@@ -117,6 +123,7 @@ define([], function() {
 		var adviceType = typeof advice;
 		
 		if(adviceType == 'string') {
+			// Advice is a string, adviceFunc must be supplied
 			if(typeof adviceFunc != 'function') {
 				throw new Error('if advice is a string, 4th param must be an advice function');
 			}
@@ -132,6 +139,7 @@ define([], function() {
 			}
 			
 		} else {
+			// Invalid param type
 			throw new Error('advice must be a string or object');
 			
 		}
@@ -144,6 +152,6 @@ define([], function() {
 
 });
 })(typeof define != 'undefined' ? define : function(deps, factory){
-    // global when, if not loaded via require
+    // global aop, if not loaded via require
     this.aop = factory();
 });
