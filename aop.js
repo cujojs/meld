@@ -59,7 +59,7 @@ define([], function() {
 			on = [];
 			afterReturning = [];
 			afterThrowing  = [];
-			after  = [];
+			after = [];
 
 			// Intercept calls to the original function, and invoke
 			// all currently registered before, around, and after advices
@@ -102,12 +102,11 @@ define([], function() {
 				// Always call "after", regardless of success return or exception.
 				callAdvice(after, this, targetArgs);
 
-				// TODO:
-				// Should we check for exception having been thrown and re-throw
-				// instead of returning?  Methinks yes, but need to do more research.
-				// if(afterType === afterThrowing) {
-				// 	throw result;
-				// }
+				// If the original (or around) threw an exception, rethrow
+				// Otherwise, return the result
+				if(afterType === afterThrowing) {
+					throw result;
+				}
 				
 				return result;
 			};
@@ -189,7 +188,7 @@ define([], function() {
 	};
 
 });
-})(typeof define != 'undefined' ? define : function(deps, factory){
+})(typeof define != 'undefined' ? define : function(deps, factory) {
     // global aop, if not loaded via require
     this.aop = factory();
 });
