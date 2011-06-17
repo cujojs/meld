@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
 	<meta charset="UTF-8">
-	<title>on Unit Tests</title>
+	<title>afterThrowing Unit Tests</title>
 	<script type="text/javascript" src="util/doh/runner.js"></script>
 	<script type="text/javascript" src="../aop.js"></script>
 	<script type="text/javascript">
@@ -18,35 +18,38 @@
 			Fixture.prototype = {
 				method: function(a) {
 					this.val++;
-					return this.val;
+					throw new Error('testing afterThrowing');
 				}
 			};
 			
-			doh.register('on', [
-				function testOn1() {
+			doh.register('before', [
+				function testAfterReturning1() {
 					var target = new Fixture();
 					
-					aop.on(target, 'method', function on1(a) {
+					// Starting value
+					doh.assertEqual(0, target.val);
+					
+					aop.afterThrowing(target, 'method', function afterReturning1(a) {
 						// this should be the advised object
 						doh.assertEqual(target, this);
 
-						// arg should not change
-						doh.assertEqual(arg, a);
+						// arg should be the exception that was thrown
+						doh.assertTrue(a instanceof Error);
 						
-						// on function should be called after
-						// the original, so val should have changed.
+						// after function should be called (duh) after
+						// the original, so val will have changed.
 						doh.assertEqual(1, this.val);
 					});
 					
-					var ret = target.method(arg);
+					try {
+						target.method(arg);
+						doh.assertTrue(false);
+					} catch(e) {}
 					
 					// after method call, val should have changed
 					doh.assertEqual(1, target.val);
-
-					// Make sure the return value is preserved
-					doh.assertEqual(ret, target.val);
 				},
-				function testOn2() {
+				function testAfterReturning2() {
 					var target = new Fixture();
 					var count = 0;
 					
@@ -56,13 +59,13 @@
 					// Starting value
 					doh.assertEqual(0, target.val);
 				
-					aop.on(target, 'method', function on0(a) {
+					aop.afterThrowing(target, 'method', function afterReturning0(a) {
 						// this should be the advised object
 						doh.assertEqual(target, this);
 
-						// arg should not change
-						doh.assertEqual(arg, a);
-						
+						// arg should be the exception that was thrown
+						doh.assertTrue(a instanceof Error);
+												
 						// after function should be called (duh) after
 						// the original, so val will have changed.
 						doh.assertEqual(1, this.val);
@@ -76,12 +79,12 @@
 						count++;
 					});
 					
-					aop.on(target, 'method', function on1(a) {
+					aop.afterThrowing(target, 'method', function afterReturning1(a) {
 						// this should be the advised object
 						doh.assertEqual(target, this);
 
-						// arg should not change
-						doh.assertEqual(arg, a);
+						// arg should be the exception that was thrown
+						doh.assertTrue(a instanceof Error);						
 						
 						// after function should be called (duh) after
 						// the original, so val will have changed.
@@ -93,12 +96,12 @@
 						count++;
 					});
 				
-					aop.on(target, 'method', function on2(a) {
+					aop.afterThrowing(target, 'method', function afterReturning2(a) {
 						// this should be the advised object
 						doh.assertEqual(target, this);
 
-						// arg should not change
-						doh.assertEqual(arg, a);
+						// arg should be the exception that was thrown
+						doh.assertTrue(a instanceof Error);
 						
 						// after function should be called (duh) after
 						// the original, so val will have changed.
@@ -107,14 +110,13 @@
 						doh.assertEqual(2, count);						
 					});
 					
-					var ret = target.method(arg);
+					try {
+						target.method(arg);
+						doh.assertTrue(false);
+					} catch(e) {}
 					
-					// original method should only have been called once, so
-					// val should only be 1.
+					// after method call, val should have changed
 					doh.assertEqual(1, target.val);
-				
-					// Make sure the return value is preserved
-					doh.assertEqual(ret, target.val);
 				}
 			]);
 

@@ -26,7 +26,7 @@
 				function testBefore1() {
 					var target = new Fixture();
 					
-					aop.add(target, 'method', 'before', function before1(a) {
+					aop.before(target, 'method', function before1(a) {
 						// this should be the advised object
 						doh.assertEqual(target, this);
 
@@ -53,7 +53,7 @@
 					// Add 3 before advices and test their invocation order,
 					// args, and return value
 
-					aop.add(target, 'method', 'before', function before0(a) {
+					aop.before(target, 'method', function before0(a) {
 						doh.assertEqual(target, this);
 						doh.assertEqual(arg, a);
 
@@ -67,7 +67,7 @@
 						doh.assertEqual(2, beforeCount);
 					});
 					
-					aop.add(target, 'method', 'before', function before1(a) {
+					aop.before(target, 'method', function before1(a) {
 						doh.assertEqual(target, this);
 						doh.assertEqual(arg, a);
 
@@ -85,7 +85,7 @@
 						beforeCount++;
 					});
 
-					aop.add(target, 'method', 'before', function before2(a) {
+					aop.before(target, 'method', function before2(a) {
 						doh.assertEqual(target, this);
 						doh.assertEqual(arg, a);
 
