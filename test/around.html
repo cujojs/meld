@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>around Unit Tests</title>
+	<script type="text/javascript" src="util/doh/runner.js"></script>
+	<script type="text/javascript" src="../aop.js"></script>
+	<script type="text/javascript">
+		(function(global, doh, aop, undef) {
+
+			var arg = "foo"; // const
+
+			// Test fixture			
+			function Fixture(shouldThrow) {
+				this.val = 0;
+				this.shouldThrow = shouldThrow;
+			}
+			
+			Fixture.prototype = {
+				method: function(a) {
+					this.val++;
+					if(this.shouldThrow) {
+						throw new Error('testing around advice with throw');
+					}
+
+					return this.val;
+				}
+			};
+			
+			doh.register('around', [
+				function testAround() {
+					var target = new Fixture();
+					
+					// Starting value
+					doh.assertEqual(0, target.val);
+					
+					aop.around(target, 'method', function aroundAdvice(joinpoint) {
+						// this should be the advised object
+						doh.assertEqual(target, this);
+						doh.assertEqual(target, joinpoint.target);
+
+						// arg should be the return value from the orig method
+						doh.assertEqual(1, joinpoint.args.length);
+						doh.assertEqual(arg, joinpoint.args[0]);
+						
+						// after function should be called (duh) after
+						// the original, so val will have changed.
+						doh.assertEqual(0, this.val);
+
+						var ret = joinpoint.proceed();
+
+						doh.assertEqual(1, ret);
+						doh.assertEqual(1, this.val);
+
+						return ret;
+					});
+					
+					var ret = target.method(arg);
+					
+					// after method call, val should have changed
+					doh.assertEqual(1, target.val);
+
+					// Make sure the return value is preserved
+					doh.assertEqual(1, ret);
+				},
+				function testAroundPreventOriginal() {
+					var target = new Fixture();
+					
+					// Starting value
+					doh.assertEqual(0, target.val);
+					
+					aop.around(target, 'method', function aroundAdvice(joinpoint) {
+						// this should be the advised object
+						doh.assertEqual(target, this);
+						doh.assertEqual(target, joinpoint.target);
+
+						// arg should be the return value from the orig method
+						doh.assertEqual(1, joinpoint.args.length);
+						doh.assertEqual(arg, joinpoint.args[0]);
+						
+						// after function should be called (duh) after
+						// the original, so val will have changed.
+						doh.assertEqual(0, this.val);
+
+						// Intentionally do not proceed to original method
+						// var ret = joinpoint.proceed();
+
+						return this.val;
+					});
+					
+					var ret = target.method(arg);
+					
+					// after method call, val should have changed
+					doh.assertEqual(0, target.val);
+
+					// Make sure the return value is preserved
+					doh.assertEqual(0, ret);
+				}
+
+			]);
+
+			doh.run();
+			
+		})(window, doh, aop);
+	</script>
+</head>
+<body>
+	
+</body>
+</html>

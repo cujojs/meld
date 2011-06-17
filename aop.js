@@ -72,11 +72,14 @@ define([], function() {
 				// Befores
 				callAdvice(before, this, targetArgs);
 				
-				// Call around if registered.  If not, call original
 				try {
+					// Call around if registered.  If not, call original
 					if(around.advice) {
+						// Around advice will execute 'on' advice, so we don't
+						// call them here.
 						result = around.advice.apply(this, targetArgs);
 					} else {
+						// When calling original, also call 'on' advice
 						result = orig.apply(this, targetArgs);
 						callAdvice(on, this, targetArgs);
 					}
@@ -89,15 +92,23 @@ define([], function() {
 
 				}
 
-				callAdvice(afterType, this, [result]);					
+				// Set args for after* advice types
+				targetArgs = [result];
 
-				// TODO: Is it correct to pass original arguments here or
-				// return result?  What if exception occurred?  Should result
-				// then be the exception?
-				
+				// Call the appropriate afterReturning/Throwing advice type based
+				// on the outcome of calling the original func or around advice
+				callAdvice(afterType, this, targetArgs);					
+
 				// Always call "after", regardless of success return or exception.
 				callAdvice(after, this, targetArgs);
 
+				// TODO:
+				// Should we check for exception having been thrown and re-throw
+				// instead of returning?  Methinks yes, but need to do more research.
+				// if(afterType === afterThrowing) {
+				// 	throw result;
+				// }
+				
 				return result;
 			};
 
@@ -124,7 +135,7 @@ define([], function() {
 							return result;
 						}
 
-						adviceFunc.call(self, { args: args, target: self, proceed: proceed });
+						return adviceFunc.call(self, { args: args, target: self, proceed: proceed });
 					};
 				}
 			};			
