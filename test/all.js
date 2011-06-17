@@ -7,6 +7,7 @@ doh.registerUrl('_fake', '../../_fake-doh.html');
 doh.registerUrl('before', '../../before.html');
 doh.registerUrl('on', '../../on.html');
 doh.registerUrl('afterReturning', '../../afterReturning.html');
+doh.registerUrl('afterThrowing', '../../afterThrowing.html');
 
 // Go
 doh.run();

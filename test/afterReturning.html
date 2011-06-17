@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
 	<meta charset="UTF-8">
-	<title>before Unit Tests</title>
+	<title>afterReturning Unit Tests</title>
 	<script type="text/javascript" src="util/doh/runner.js"></script>
 	<script type="text/javascript" src="../aop.js"></script>
 	<script type="text/javascript">
@@ -29,7 +29,7 @@
 					// Starting value
 					doh.assertEqual(0, target.val);
 					
-					aop.add(target, 'method', 'afterReturning', function afterReturning1(a) {
+					aop.afterReturning(target, 'method', function afterReturning1(a) {
 						// this should be the advised object
 						doh.assertEqual(target, this);
 
@@ -59,7 +59,7 @@
 					// Starting value
 					doh.assertEqual(0, target.val);
 				
-					aop.add(target, 'method', 'afterReturning', function afterReturning0(a) {
+					aop.afterReturning(target, 'method', function afterReturning0(a) {
 						// this should be the advised object
 						doh.assertEqual(target, this);
 
@@ -79,7 +79,7 @@
 						count++;
 					});
 					
-					aop.add(target, 'method', 'afterReturning', function afterReturning1(a) {
+					aop.afterReturning(target, 'method', function afterReturning1(a) {
 						// this should be the advised object
 						doh.assertEqual(target, this);
 
@@ -96,7 +96,7 @@
 						count++;
 					});
 				
-					aop.add(target, 'method', 'afterReturning', function afterReturning2(a) {
+					aop.afterReturning(target, 'method', function afterReturning2(a) {
 						// this should be the advised object
 						doh.assertEqual(target, this);
 

@@ -1,3 +1,8 @@
+/**
+ * @license Copyright (c) 2011 Brian Cavalier
+ * LICENSE: see the LICENSE.txt file. If file is missing, this file is subject
+ * to the MIT License at: http://www.opensource.org/licenses/mit-license.php.
+ */
 
 // TODO:
 // 1. Strategy for removing advice
@@ -12,26 +17,33 @@ define([], function() {
 	append  = ap.push;
 	slice   = ap.slice;
 	
+	// Helper to convert arguments to an array
 	function argsToArray(a) {
 		return slice.call(a);
 	}
 
-	function callAdvice(advices, target, args) {
+	// Invoke all advice functions in the supplied context, with the
+	// supplied args.
+	function callAdvice(advices, context, args) {
 		var i, advice;
 
 		i = 0;
 		
 		while((advice = advices[i++])) {
-			advice.apply(target, args);
+			advice.apply(context, args);
 		}
 	}
 
+	// Creates a function to add a new advice function in the correct
+	// order (prepend or append).
 	function makeAdviceAdd(advices, order) {
 		return function(adviceFunc) {
 			order.call(advices, adviceFunc);
 		};
 	}
 	
+	// Returns the advisor for the target object-function pair.  A new advisor
+	// will be created if one does not already exist.
 	function getAdvisor(target, func) {
 		var advised = target[func];
 		
@@ -120,48 +132,48 @@ define([], function() {
 		return advised._advisor;
 	}
 
-	function addAdvice(target, func, type, adviceFunc) {
-		var advisor = getAdvisor(target, func);
+	// Add a single advice, creating a new advisor for the target func, if necessary.
+	function addAdvice(object, func, type, adviceFunc) {
+		var advisor = getAdvisor(object, func);
 
 		advisor[type](adviceFunc);
 
 		return advisor;
 	}
 	
-	function add(object, func, aspect, /* Optional */ adviceFunc) {
-		var adviceType = typeof aspect;
+	// Add an aspect, which may consist of multiple advices.
+	function add(object, func, aspect) {
+		// aspect is an object, and should have keys for advice types,
+		// whose values are the advice functions.
 		
-		if(adviceType == 'string') {
-			// Advice is a string, adviceFunc must be supplied
-			if(typeof adviceFunc != 'function') {
-				throw new Error('if advice is a string, 4th param must be an advice function');
-			}
-			
-			// Add single advice
-			addAdvice(object, func, aspect, adviceFunc);
-			
-		} else if (adviceType == 'object') {
-			// Advice is an object, and should have keys for advice types,
-			// whose values are the function to use.
-			
-			// First, get the advisor for this object/func pair
-			var advisor = getAdvisor(object, func);
-			
-			// Register all advices with the advisor
-			for(var a in aspect) {
-				advisor[a](aspect[a]);
-			}
-			
-		} else {
-			// Invalid param type
-			throw new Error('advice must be a string or object');
-			
+		// First, get the advisor for this object/func pair
+		var advisor = getAdvisor(object, func);
+		
+		// Register all advices with the advisor
+		for(var a in aspect) {
+			advisor[a](aspect[a]);
+		}		
+	}
+
+	// Create an API function for the specified advice type
+	function adviceApi(type) {
+		return function(target, func, adviceFunc) {
+			return addAdvice(target, func, type, adviceFunc);
 		}
 	}
-	
+
 	// Public API
 	return {
-		add: add
+		// General add aspect
+		add:            add,
+
+		// Add a single, specific type of advice
+		before:         adviceApi('before'),
+		around:         adviceApi('around'),
+		on:             adviceApi('on'),
+		afterReturning: adviceApi('afterReturning'),
+		afterThrowing:  adviceApi('afterThrowing'),
+		after:          adviceApi('after')
 	};
 
 });
