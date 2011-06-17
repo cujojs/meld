@@ -109,6 +109,7 @@ define([], function() {
 						function proceed() {
 							var result = aroundee.apply(self, args);
 							callAdvice(on, self, args);
+							return result;
 						}
 
 						adviceFunc.call(self, { args: args, target: self, proceed: proceed });
