@@ -36,16 +36,18 @@ define([], function() {
 		var advised = target[func];
 		
 		if(!advised._advisor) {
-			var orig, before, afterReturning, afterThrowing, after, around;
+			var orig, before, around, on, afterReturning, afterThrowing, after;
 
 			// Save the original, not-yet-advised function
 			orig = advised;
 			
+			// Advices.  They'll be invoked in this order.
 			before = [];
-			after  = [];
+			around = {};
+			on = [];
 			afterReturning = [];
 			afterThrowing  = [];
-			around = {};
+			after  = [];
 
 			// Intercept calls to the original function, and invoke
 			// all currently registered before, around, and after advices
@@ -60,8 +62,13 @@ define([], function() {
 				
 				// Call around if registered.  If not, call original
 				try {
-					result = (around.advice||orig).apply(this, targetArgs);
-
+					if(around.advice) {
+						result = around.advice.apply(this, targetArgs);
+					} else {
+						result = orig.apply(this, targetArgs);
+						callAdvice(on, this, targetArgs);
+					}
+					
 				} catch(e) {
 					// If an exception was thrown, save it as the result,
 					// and switch to afterThrowing
@@ -84,6 +91,7 @@ define([], function() {
 
 			advised._advisor = {
 				before:         makeAdviceAdd(before, prepend),
+				on:             makeAdviceAdd(on, append),
 				afterReturning: makeAdviceAdd(afterReturning, append),
 				afterThrowing:  makeAdviceAdd(afterThrowing, append),
 				after:          makeAdviceAdd(after, append),
@@ -99,7 +107,8 @@ define([], function() {
 						self = this;
 
 						function proceed() {
-							return aroundee.apply(self, args);
+							var result = aroundee.apply(self, args);
+							callAdvice(on, self, args);
 						}
 
 						adviceFunc.call(self, { args: args, target: self, proceed: proceed });
@@ -119,8 +128,8 @@ define([], function() {
 		return advisor;
 	}
 	
-	function advice(object, func, advice, /* Optional */ adviceFunc) {
-		var adviceType = typeof advice;
+	function add(object, func, aspect, /* Optional */ adviceFunc) {
+		var adviceType = typeof aspect;
 		
 		if(adviceType == 'string') {
 			// Advice is a string, adviceFunc must be supplied
@@ -129,13 +138,18 @@ define([], function() {
 			}
 			
 			// Add single advice
-			addAdvice(object, func, advice, adviceFunc);
+			addAdvice(object, func, aspect, adviceFunc);
 			
 		} else if (adviceType == 'object') {
 			// Advice is an object, and should have keys for advice types,
 			// whose values are the function to use.
-			for(var a in advice) {
-				addAdvice(object, func, a, advice[a]);
+			
+			// First, get the advisor for this object/func pair
+			var advisor = getAdvisor(object, func);
+			
+			// Register all advices with the advisor
+			for(var a in aspect) {
+				advisor[a](aspect[a]);
 			}
 			
 		} else {
@@ -147,7 +161,7 @@ define([], function() {
 	
 	// Public API
 	return {
-		add: advice
+		add: add
 	};
 
 });
