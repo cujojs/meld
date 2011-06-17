@@ -129,8 +129,8 @@ define([], function() {
 						args = argsToArray(arguments);
 						self = this;
 
-						function proceed() {
-							var result = aroundee.apply(self, args);
+						function proceed(modifiedArgs) {
+							var result = aroundee.apply(self, modifiedArgs||args);
 							callAdvice(on, self, args);
 							return result;
 						}
