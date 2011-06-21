@@ -88,63 +88,39 @@
 				},
 				function testMultipleAround() {
 					var target = new Fixture();
-					
-					// Starting value
-					doh.assertEqual(0, target.val);
 
+					var count = 0;
+					
 					// Around advice should "stack" in layers from inner to outer
 					
 					// Inner
-					aop.around(target, 'method', function aroundAdvice1(joinpoint) {
-						// this should be the advised object
-						doh.assertEqual(target, this);
-						doh.assertEqual(target, joinpoint.target);
+					aop.around(target, 'method', function aroundAdviceInner(joinpoint) {
+						// Verify the outer around has been called
+						doh.assertEqual(1, count);
 
-						// arg should be the return value from the orig method
-						doh.assertEqual(1, joinpoint.args.length);
-						doh.assertEqual(arg, joinpoint.args[0]);
-						
-						// after function should be called (duh) after
-						// the original, so val will have changed.
-						doh.assertEqual(0, this.val);
+						// This will proceed to the original method
+						joinpoint.proceed();
 
-						var ret = joinpoint.proceed();
-
-						doh.assertEqual(1, ret);
-						doh.assertEqual(1, this.val);
-
-						return ret;
+						// Verify no more arounds have been called
+						doh.assertEqual(1, count);
+						// Indicate this inner around has been called
+						count++;
 					});
 
 					// Outer
-					aop.around(target, 'method', function aroundAdvice2(joinpoint) {
-						// this should be the advised object
-						doh.assertEqual(target, this);
-						doh.assertEqual(target, joinpoint.target);
+					aop.around(target, 'method', function aroundAdviceOuter(joinpoint) {
+						// Verify this is the first around advice to be called
+						doh.assertEqual(0, count);
+						count++;
 
-						// arg should be the return value from the orig method
-						doh.assertEqual(1, joinpoint.args.length);
-						doh.assertEqual(arg, joinpoint.args[0]);
-						
-						// after function should be called (duh) after
-						// the original, so val will have changed.
-						doh.assertEqual(0, this.val);
+						// This will proceed to the inner around
+						joinpoint.proceed();
 
-						var ret = joinpoint.proceed();
-
-						doh.assertEqual(1, ret);
-						doh.assertEqual(1, this.val);
-
-						return ret;
+						// Verify that the inner around around has been called
+						doh.assertEqual(2, count);
 					});
 					
-					var ret = target.method(arg);
-					
-					// after method call, val should have changed
-					doh.assertEqual(1, target.val);
-
-					// Make sure the return value is preserved
-					doh.assertEqual(1, ret);
+					target.method(arg);
 				},
 				function testAroundModifyArgs() {
 					var target = new Fixture();
@@ -153,10 +129,6 @@
 					doh.assertEqual(0, target.val);
 					
 					aop.around(target, 'method', function aroundAdvice(joinpoint) {
-						// this should be the advised object
-						doh.assertEqual(target, this);
-						doh.assertEqual(target, joinpoint.target);
-
 						// arg should be the return value from the orig method
 						doh.assertEqual(1, joinpoint.args.length);
 						doh.assertEqual(arg, joinpoint.args[0]);
@@ -191,22 +163,7 @@
 					doh.assertEqual(0, target.val);
 					
 					aop.around(target, 'method', function aroundAdvice(joinpoint) {
-						// this should be the advised object
-						doh.assertEqual(target, this);
-						doh.assertEqual(target, joinpoint.target);
-
-						// arg should be the return value from the orig method
-						doh.assertEqual(1, joinpoint.args.length);
-						doh.assertEqual(arg, joinpoint.args[0]);
-						
-						// after function should be called (duh) after
-						// the original, so val will have changed.
-						doh.assertEqual(0, this.val);
-
-						var ret = joinpoint.proceed();
-
-						doh.assertEqual(1, ret);
-						doh.assertEqual(1, this.val);
+						joinpoint.proceed();
 
 						return 10;
 					});
@@ -227,18 +184,6 @@
 					doh.assertEqual(0, target.val);
 					
 					aop.around(target, 'method', function aroundAdvice(joinpoint) {
-						// this should be the advised object
-						doh.assertEqual(target, this);
-						doh.assertEqual(target, joinpoint.target);
-
-						// arg should be the return value from the orig method
-						doh.assertEqual(1, joinpoint.args.length);
-						doh.assertEqual(arg, joinpoint.args[0]);
-						
-						// after function should be called (duh) after
-						// the original, so val will have changed.
-						doh.assertEqual(0, this.val);
-
 						// Intentionally do not proceed to original method
 						// var ret = joinpoint.proceed();
 
