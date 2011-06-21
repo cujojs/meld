@@ -10,13 +10,17 @@
 (function(define, undef) {
 define([], function() {
 	
-	var ap, prepend, append, slice;
+	var ap, prepend, append, slice, isArray;
 	
 	ap      = Array.prototype;
 	prepend = ap.unshift;
 	append  = ap.push;
 	slice   = ap.slice;
 	
+	isArray = Array.isArray || function(it) {
+		return Object.prototype.toString.call(it) == '[object Array]';
+	};
+
 	// Helper to convert arguments to an array
 	function argsToArray(a) {
 		return slice.call(a);
@@ -38,7 +42,13 @@ define([], function() {
 	// order (prepend or append).
 	function makeAdviceAdd(advices, order) {
 		return function(adviceFunc) {
-			order.call(advices, adviceFunc);
+			if(isArray(adviceFunc)) {
+				for (var i = 0, len = adviceFunc.length; i < len; i++) {
+					order.call(advices, adviceFunc[i]);
+				}
+			} else {
+				order.call(advices, adviceFunc);
+			}
 		};
 	}
 	
@@ -48,7 +58,7 @@ define([], function() {
 		var advised = target[func];
 		
 		if(!advised._advisor) {
-			var orig, before, around, on, afterReturning, afterThrowing, after;
+			var orig, before, around, afterReturning, afterThrowing, after;
 
 			// Save the original, not-yet-advised function
 			orig = advised;
@@ -56,7 +66,6 @@ define([], function() {
 			// Advices.  They'll be invoked in this order.
 			before = [];
 			around = {};
-			on = [];
 			afterReturning = [];
 			afterThrowing  = [];
 			after = [];
@@ -74,15 +83,7 @@ define([], function() {
 				
 				try {
 					// Call around if registered.  If not, call original
-					if(around.advice) {
-						// Around advice will execute 'on' advice, so we don't
-						// call them here.
-						result = around.advice.apply(this, targetArgs);
-					} else {
-						// When calling original, also call 'on' advice
-						result = orig.apply(this, targetArgs);
-						callAdvice(on, this, targetArgs);
-					}
+					result = (around.advice||orig).apply(this, targetArgs);
 					
 				} catch(e) {
 					// If an exception was thrown, save it as the result,
@@ -113,7 +114,6 @@ define([], function() {
 
 			advised._advisor = {
 				before:         makeAdviceAdd(before, prepend),
-				on:             makeAdviceAdd(on, append),
 				afterReturning: makeAdviceAdd(afterReturning, append),
 				afterThrowing:  makeAdviceAdd(afterThrowing, append),
 				after:          makeAdviceAdd(after, append),
@@ -123,18 +123,36 @@ define([], function() {
 					var aroundee = around.advice || orig;
 
 					around.advice = function() {
-						var args, self;
+						var args, self, proceed, joinpoint;
 						
-						args = argsToArray(arguments);
-						self = this;
+						// Proceed to next around or original
+						proceed = function(modifiedArgs) {
+							return aroundee.apply(self, modifiedArgs||args);
+						};
 
-						function proceed(modifiedArgs) {
-							var result = aroundee.apply(self, modifiedArgs||args);
-							callAdvice(on, self, args);
-							return result;
-						}
+						// Joinpoint representing the original method call
+						joinpoint = {
+							// Original arguments
+							args:   (args = argsToArray(arguments)),
+							// Target object on which the method was called
+							target: (self = this),
+							// The name of the method that was called
+							method: func,
+							// Proceed function.  Advice function should call this to trigger
+							// the next around or the original method invocation
+							proceed: function(modifiedArgs) {
+								// Call next around or original and get result
+								var result = proceed(modifiedArgs);
 
-						return adviceFunc.call(self, { args: args, target: self, proceed: proceed });
+								// Overwrite proceed to ensure the original can only be called once
+								proceed = function() { throw new Error("proceed() already called"); };
+
+								return result;
+							}
+						};
+
+						// Call outermost around advice to start the chain
+						return adviceFunc.call(self, joinpoint);
 					};
 				}
 			};			
@@ -153,16 +171,16 @@ define([], function() {
 	}
 	
 	// Add an aspect, which may consist of multiple advices.
-	function add(object, func, aspect) {
-		// aspect is an object, and should have keys for advice types,
+	function add(object, func, advices) {
+		// advices is an object, and should have keys for advice types,
 		// whose values are the advice functions.
 		
 		// First, get the advisor for this object/func pair
 		var advisor = getAdvisor(object, func);
 		
 		// Register all advices with the advisor
-		for(var a in aspect) {
-			advisor[a](aspect[a]);
+		for(var a in advices) {
+			advisor[a](advices[a]);
 		}		
 	}
 
@@ -170,7 +188,7 @@ define([], function() {
 	function adviceApi(type) {
 		return function(target, func, adviceFunc) {
 			return addAdvice(target, func, type, adviceFunc);
-		}
+		};
 	}
 
 	// Public API
@@ -181,7 +199,6 @@ define([], function() {
 		// Add a single, specific type of advice
 		before:         adviceApi('before'),
 		around:         adviceApi('around'),
-		on:             adviceApi('on'),
 		afterReturning: adviceApi('afterReturning'),
 		afterThrowing:  adviceApi('afterThrowing'),
 		after:          adviceApi('after')
