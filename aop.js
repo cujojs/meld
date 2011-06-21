@@ -10,7 +10,9 @@
 (function(define, undef) {
 define([], function() {
 	
-	var ap, prepend, append, slice, isArray;
+	var VERSION, ap, prepend, append, slice, isArray;
+
+	VERSION = "0.1.0";
 	
 	ap      = Array.prototype;
 	prepend = ap.unshift;
@@ -201,7 +203,10 @@ define([], function() {
 		around:         adviceApi('around'),
 		afterReturning: adviceApi('afterReturning'),
 		afterThrowing:  adviceApi('afterThrowing'),
-		after:          adviceApi('after')
+		after:          adviceApi('after'),
+
+		// Version
+		version:        VERSION
 	};
 
 });
