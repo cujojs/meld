@@ -17,7 +17,7 @@ define([], function() {
 	append  = ap.push;
 	slice   = ap.slice;
 	
-	isArray = Array.isArray || function(it) {
+	isArray = Array.isArray || function isArrayShim(it) {
 		return Object.prototype.toString.call(it) == '[object Array]';
 	};
 
