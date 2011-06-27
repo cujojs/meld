@@ -13,6 +13,7 @@ doh.registerUrl('after', '../../after.html');
 
 // Pointcuts
 doh.registerUrl('pointcut', '../../pointcut.html');
+doh.registerUrl('prototype', '../../prototype.html');
 
 // Go
 doh.run();

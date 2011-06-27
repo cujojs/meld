@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
 	<meta charset="UTF-8">
-	<title>Pointcut Unit Tests</title>
+	<title>Prototype AOP Unit Tests</title>
 	<script src="util/doh/runner.js"></script>
 	<script src="../aop.js"></script>
 	<script type="text/javascript">
@@ -28,15 +28,15 @@
 			
 			Fixture.prototype = makeProto('method1', 'method2', 'methodA', 'methodB', 'blah');
 			
-			doh.register('pointcut', [
-				function testStringPointcut1() {
+			doh.register('prototype', [
+				function testStringPrototype1() {
 					var target = new Fixture();
 
 					var called = 0;
 
 					function advice() { called++; }
 
-					aop.add(target, 'method1', {
+					aop.add(Fixture, 'method1', {
 						before: advice,
 						after: advice
 					});
@@ -51,14 +51,14 @@
 					doh.assertEqual(2, called);
 					doh.assertEqual(['method1', 'blah'], target.calls);
 				},
-				function testArrayPointcut1() {
+				function testArrayPrototype1() {
 					var target = new Fixture();
 
 					var called = 0;
 
 					function advice() { called++; }
 
-					aop.add(target, ['method1', 'methodA'], {
+					aop.add(Fixture, ['method1', 'methodA'], {
 						before: advice
 					});
 
@@ -75,14 +75,14 @@
 					doh.assertEqual(2, called);
 					doh.assertEqual(['method1', 'methodA', 'blah'], target.calls);
 				},				
-				function testRegExpPointcut1() {
+				function testRegExpPrototype1() {
 					var target = new Fixture();
 
 					var called = 0;
 
 					function advice() { called++; }
 
-					aop.add(target, /^method(1|a)$/i, {
+					aop.add(Fixture, /^method(1|a)$/i, {
 						before: advice
 					});
 
@@ -99,7 +99,7 @@
 					doh.assertEqual(2, called);
 					doh.assertEqual(['method1', 'methodA', 'blah'], target.calls);
 				},				
-				function testFunctionPointcut1() {
+				function testFunctionPrototype1() {
 					var target = new Fixture();
 
 					var called = 0;
@@ -110,7 +110,7 @@
 						return ['method1', 'methodA'];
 					}
 
-					aop.add(target, pointcut, {
+					aop.add(Fixture, pointcut, {
 						before: advice
 					});
 
