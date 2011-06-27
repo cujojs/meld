@@ -4,11 +4,15 @@
 doh.registerUrl('_fake', '../../_fake-doh.html');
 
 // Real tests
+// Basic advice
 doh.registerUrl('before', '../../before.html');
 doh.registerUrl('around', '../../around.html');
 doh.registerUrl('afterReturning', '../../afterReturning.html');
 doh.registerUrl('afterThrowing', '../../afterThrowing.html');
 doh.registerUrl('after', '../../after.html');
+
+// Pointcuts
+doh.registerUrl('pointcut', '../../pointcut.html');
 
 // Go
 doh.run();

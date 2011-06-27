@@ -58,6 +58,8 @@ define([], function() {
 	// will be created if one does not already exist.
 	function getAdvisor(target, func) {
 		var advised = target[func];
+
+		if(typeof advised !== 'function') throw new Error('Advice can only be applied to functions: ' + func);
 		
 		if(!advised._advisor) {
 			var orig, before, around, afterReturning, afterThrowing, after;
@@ -129,7 +131,7 @@ define([], function() {
 						
 						// Proceed to next around or original
 						proceed = function(modifiedArgs) {
-							return aroundee.apply(self, modifiedArgs||args);
+							return aroundee.apply(self, modifiedArgs || args);
 						};
 
 						// Joinpoint representing the original method call
@@ -165,15 +167,15 @@ define([], function() {
 
 	// Add a single advice, creating a new advisor for the target func, if necessary.
 	function addAdvice(object, func, type, adviceFunc) {
-		var advisor = getAdvisor(object, func);
+		var advisor = getAdvisor(findTarget(object), func);
 
 		advisor[type](adviceFunc);
 
 		return advisor;
 	}
 	
-	// Add an aspect, which may consist of multiple advices.
-	function add(object, func, advices) {
+	// Add several advice types to func
+	function addToFunc(object, func, advices) {
 		// advices is an object, and should have keys for advice types,
 		// whose values are the advice functions.
 		
@@ -183,8 +185,53 @@ define([], function() {
 		// Register all advices with the advisor
 		for(var a in advices) {
 			advisor[a](advices[a]);
-		}		
+		}
 	}
+
+	function addToArray(object, funcArray, advices) {
+		var f, i = 0;
+		while((f = funcArray[i++])) {
+			addToFunc(object, f, advices);
+		}
+	}
+
+	function addAspect(target, pointcut, advices) {
+		// pointcut can be: string, Array of strings, RegExp, Function
+		var pointcutType;
+
+        target = findTarget(target);
+
+		if(isArray(pointcut)) {
+			addToArray(target, pointcut, advices);
+
+		} else {
+			pointcutType = typeof pointcut;
+
+			if(pointcutType === 'string') {
+				addToFunc(target, pointcut, advices);
+
+			} else if(pointcutType === 'function') {
+				addToArray(target, pointcut(target), advices);
+
+			} else {
+				// Assume the pointcut is a RegExp
+				for(var p in target) {
+					// TODO: Decide whether hasOwnProperty is correct here
+					// Only apply to own properties that are functions, and match the pointcut regexp
+					if(typeof target[p] === 'function' && pointcut.test(p)) {
+					// if(object.hasOwnProperty(p) && typeof object[p] === 'function' && pointcut.test(p)) {
+						addToFunc(target, p, advices);
+
+					}
+				}
+
+			}
+		}
+	}
+
+    function findTarget(target) {
+        return target.prototype || target;
+    }
 
 	// Create an API function for the specified advice type
 	function adviceApi(type) {
@@ -196,7 +243,7 @@ define([], function() {
 	// Public API
 	return {
 		// General add aspect
-		add:            add,
+		add:            addAspect,
 
 		// Add a single, specific type of advice
 		before:         adviceApi('before'),
