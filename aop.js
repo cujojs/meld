@@ -7,12 +7,12 @@
 // TODO:
 // 1. Strategy for removing advice
 // 2. Provide access to advisor
-(function(define, undef) {
+(function(define) {
 define([], function() {
 	
-	var VERSION, ap, prepend, append, slice, isArray;
+	var VERSION, ap, prepend, append, slice, isArray, undef;
 
-	VERSION = "0.1.0";
+	VERSION = "0.2.0";
 	
 	ap      = Array.prototype;
 	prepend = ap.unshift;
@@ -166,8 +166,8 @@ define([], function() {
 	}
 
 	// Add a single advice, creating a new advisor for the target func, if necessary.
-	function addAdvice(object, func, type, adviceFunc) {
-		var advisor = getAdvisor(findTarget(object), func);
+	function addAdvice(target, func, type, adviceFunc) {
+		var advisor = getAdvisor(findTarget(target), func);
 
 		advisor[type](adviceFunc);
 
