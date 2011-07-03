@@ -178,13 +178,18 @@ define([], function() {
 	function addToFunc(object, func, advices) {
 		// advices is an object, and should have keys for advice types,
 		// whose values are the advice functions.
-		
+
 		// First, get the advisor for this object/func pair
-		var advisor = getAdvisor(object, func);
+		var advisor, addAdvice;
 		
+		advisor = getAdvisor(object, func);
+
 		// Register all advices with the advisor
-		for(var a in advices) {
-			advisor[a](advices[a]);
+		for (var a in advices) {
+			addAdvice = advisor[a];
+			if (addAdvice) {
+				addAdvice(advices[a]);
+			}
 		}
 	}
 
@@ -208,7 +213,9 @@ define([], function() {
 			pointcutType = typeof pointcut;
 
 			if(pointcutType === 'string') {
-				addToFunc(target, pointcut, advices);
+				if(typeof target[pointcut] === 'function') {
+					addToFunc(target, pointcut, advices);
+				}
 
 			} else if(pointcutType === 'function') {
 				addToArray(target, pointcut(target), advices);
