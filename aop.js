@@ -9,9 +9,9 @@
 // 2. Provide access to advisor
 (function(define) {
 define([], function() {
-	
-	var VERSION, ap, prepend, append, slice, isArray, undef;
 
+var VERSION, ap, prepend, append, slice, isArray;
+	
 	VERSION = "0.2.0";
 	
 	ap      = Array.prototype;
