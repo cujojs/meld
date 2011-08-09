@@ -57,6 +57,8 @@ var VERSION, ap, prepend, append, slice, isArray;
 	// Returns the advisor for the target object-function pair.  A new advisor
 	// will be created if one does not already exist.
 	function getAdvisor(target, func) {
+		if(!(func in target)) return;
+
 		var advised = target[func];
 
 		if(typeof advised !== 'function') throw new Error('Advice can only be applied to functions: ' + func);
@@ -169,8 +171,10 @@ var VERSION, ap, prepend, append, slice, isArray;
 	function addAdvice(target, func, type, adviceFunc) {
 		var advisor = getAdvisor(findTarget(target), func);
 
-		advisor[type](adviceFunc);
-
+		if(advisor) {
+			advisor[type](adviceFunc);
+		}
+		
 		return advisor;
 	}
 	
@@ -184,11 +188,13 @@ var VERSION, ap, prepend, append, slice, isArray;
 		
 		advisor = getAdvisor(object, funcName);
 
-		// Register all advices with the advisor
-		for (var a in advice) {
-			addAdvice = advisor[a];
-			if (addAdvice) {
-				addAdvice(advice[a]);
+		if(advisor) {
+			// Register all advices with the advisor
+			for (var a in advice) {
+				addAdvice = advisor[a];
+				if (addAdvice) {
+					addAdvice(advice[a]);
+				}
 			}
 		}
 	}
