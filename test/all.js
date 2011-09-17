@@ -7,6 +7,7 @@ doh.registerUrl('_fake', '../../_fake-doh.html');
 // Basic advice
 doh.registerUrl('before', '../../before.html');
 doh.registerUrl('around', '../../around.html');
+doh.registerUrl('on', '../../on.html');
 doh.registerUrl('afterReturning', '../../afterReturning.html');
 doh.registerUrl('afterThrowing', '../../afterThrowing.html');
 doh.registerUrl('after', '../../after.html');

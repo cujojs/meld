@@ -6,7 +6,7 @@
 
 // TODO:
 // 1. Strategy for removing advice
-// 2. Provide access to advisor
+// 2. Provide access to advisor?
 (function(define) {
 define([], function() {
 
@@ -64,7 +64,7 @@ var VERSION, ap, prepend, append, slice, isArray;
 		if(typeof advised !== 'function') throw new Error('Advice can only be applied to functions: ' + func);
 		
 		if(!advised._advisor) {
-			var orig, before, around, afterReturning, afterThrowing, after;
+			var orig, before, on, around, afterReturning, afterThrowing, after;
 
 			// Save the original, not-yet-advised function
 			orig = advised;
@@ -72,6 +72,7 @@ var VERSION, ap, prepend, append, slice, isArray;
 			// Advices.  They'll be invoked in this order.
 			before = [];
 			around = {};
+			on = [];
 			afterReturning = [];
 			afterThrowing  = [];
 			after = [];
@@ -79,18 +80,24 @@ var VERSION, ap, prepend, append, slice, isArray;
 			// Intercept calls to the original function, and invoke
 			// all currently registered before, around, and after advices
 			advised = target[func] = function() {
-				var targetArgs, result, afterType;
+				var self, targetArgs, result, afterType;
 
+				self = this;
 				targetArgs = argsToArray(arguments);
 				afterType = afterReturning;
 
+				function callAdviceWithContext(advice, targetArgs) {
+					callAdvice(advice, self, targetArgs);
+				}
+
 				// Befores
-				callAdvice(before, this, targetArgs);
+				callAdviceWithContext(before, targetArgs);
 				
 				try {
 					// Call around if registered.  If not, call original
 					result = (around.advice||orig).apply(this, targetArgs);
-					
+					callAdviceWithContext(on, targetArgs);
+
 				} catch(e) {
 					// If an exception was thrown, save it as the result,
 					// and switch to afterThrowing
@@ -104,10 +111,10 @@ var VERSION, ap, prepend, append, slice, isArray;
 
 				// Call the appropriate afterReturning/Throwing advice type based
 				// on the outcome of calling the original func or around advice
-				callAdvice(afterType, this, targetArgs);					
+				callAdviceWithContext(afterType, targetArgs);
 
 				// Always call "after", regardless of success return or exception.
-				callAdvice(after, this, targetArgs);
+				callAdviceWithContext(after, targetArgs);
 
 				// If the original (or around) threw an exception, rethrow
 				// Otherwise, return the result
@@ -120,6 +127,7 @@ var VERSION, ap, prepend, append, slice, isArray;
 
 			advised._advisor = {
 				before:         makeAdviceAdd(before, prepend),
+				on:             makeAdviceAdd(on, append),
 				afterReturning: makeAdviceAdd(afterReturning, append),
 				afterThrowing:  makeAdviceAdd(afterThrowing, append),
 				after:          makeAdviceAdd(after, append),
@@ -269,6 +277,7 @@ var VERSION, ap, prepend, append, slice, isArray;
 		// Add a single, specific type of advice
 		before:         adviceApi('before'),
 		around:         adviceApi('around'),
+		on:             adviceApi('on'),
 		afterReturning: adviceApi('afterReturning'),
 		afterThrowing:  adviceApi('afterThrowing'),
 		after:          adviceApi('after'),

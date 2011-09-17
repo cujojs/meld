@@ -1,0 +1,35 @@
+{
+    "name": "aop",
+    "version": "0.5",
+    "description": "A light, fast, flexible Javascript IOC container.",
+    "keywords": ["aop"],
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "http://www.opensource.org/licenses/mit-license.php"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/briancavalier/aop.js.git"
+        }
+    ],
+    "bugs": "https://github.com/briancavalier/aop.js/issues",
+    "maintainers": [
+        {
+            "name": "Brian Cavalier",
+            "web": "http://hovercraftstudios.com"
+        }
+    ],
+    "contributors": [
+        {
+            "name": "Brian Cavalier",
+            "web": "http://hovercraftstudios.com"
+        }
+    ],
+    "main": "./aop",
+    "directories": {
+        "test": "test"
+    }
+}
