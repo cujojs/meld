@@ -4,21 +4,18 @@
  * to the MIT License at: http://www.opensource.org/licenses/mit-license.php.
  */
 
-// TODO:
-// 1. Strategy for removing advice
-// 2. Provide access to advisor?
 (function(define) {
 define([], function() {
 
-var VERSION, ap, prepend, append, slice, isArray;
-	
-	VERSION = "0.2.0";
-	
+	var VERSION, ap, prepend, append, slice, isArray;
+
+	VERSION = "0.5.0";
+
 	ap      = Array.prototype;
 	prepend = ap.unshift;
 	append  = ap.push;
 	slice   = ap.slice;
-	
+
 	isArray = Array.isArray || function isArrayShim(it) {
 		return Object.prototype.toString.call(it) == '[object Array]';
 	};
@@ -26,6 +23,136 @@ var VERSION, ap, prepend, append, slice, isArray;
 	// Helper to convert arguments to an array
 	function argsToArray(a) {
 		return slice.call(a);
+	}
+
+	function Advisor(target, func) {
+
+		var orig, advisor;
+
+		this.target = target;
+		this.func = func;
+
+		orig = this.orig = target[func];
+		advisor = this;
+
+		target[func] = function() {
+			var args, result, afterType, exception;
+
+			function callAfter(afterType, args) {
+				advisor._callAdvice(advisor.head, afterType, target, args);
+			}
+
+			args = argsToArray(arguments);
+			afterType = 'afterReturning';
+
+			advisor._callAdvice(advisor.tail, 'before', target, args);
+
+			try {
+				result = orig.apply(target, args);
+			} catch(e) {
+				result = exception = e;
+				afterType = 'afterThrowing'
+			}
+
+			args = [result];
+
+			callAfter(afterType, args);
+			callAfter('after', args);
+
+			advisor._callAdvice(advisor.head, 'after', target, args);
+
+			if(exception) {
+				throw exception;
+			}
+
+			return result;
+		}
+	}
+
+	Advisor.prototype = {
+		
+		// Invoke all advice functions in the supplied context, with the
+		// supplied args.
+		_callAdvice: function(list, adviceType, context, args) {
+
+			var direction, current, advice;
+
+			direction = list === this.tail ? 'prev' : 'next';
+			current = list;
+
+			while (current) {
+				advice = current.aspect[adviceType];
+				if (advice) {
+					advice.apply(context, args);
+				}
+
+				current = current[direction];
+			}
+		},
+
+		// Adds the supplied aspect to the advised target method
+		add: function(aspect) {
+
+			var aspectItem, remove;
+
+			aspectItem = {
+				prev: this.tail,
+				aspect: aspect
+			};
+
+			if(this.tail) {
+				this.tail = this.tail.next = aspectItem;
+			} else {
+				this.tail = this.head = aspectItem;
+			}
+
+			remove = aspectItem.remove = function() {
+				var prev, next;
+
+				prev = aspectItem.prev;
+				next = aspectItem.next;
+
+				if(prev) { prev.next = next; }
+				if(next) { next.prev = prev; }
+			};
+
+			return remove;
+		},
+
+		// Removes the Advisor and thus, all aspects from the advised target method.
+		remove: function() {
+			this.target[this.func]._advisor = null;
+			this.target[this.func] = this.orig;
+		}
+	};
+
+	// Returns the advisor for the target object-function pair.  A new advisor
+	// will be created if one does not already exist.
+	Advisor.get = function(target, func) {
+		if(!(func in target)) return;
+
+		var advisor, advised;
+
+		advised = target[func];
+
+		if(typeof advised !== 'function') throw new Error('Advice can only be applied to functions: ' + func);
+
+		advisor = advised._advisor;
+		if(!advisor) {
+			advisor = advised._advisor = new Advisor(target, func);
+		}
+
+		return advisor;
+	};
+
+	function addAspect(target, method, aspect) {
+		var advisor = Advisor.get(findTarget(target), method);
+
+		if(advisor) {
+			return advisor.add(aspect);
+		} else {
+			throw new Error('Target does not have method: ' + method);
+		}
 	}
 
 	// Invoke all advice functions in the supplied context, with the
@@ -214,7 +341,7 @@ var VERSION, ap, prepend, append, slice, isArray;
 		}
 	}
 
-	function addAspect(target, pointcut, advice) {
+	function addAspect2(target, pointcut, advice) {
 		// pointcut can be: string, Array of strings, RegExp, Function(targetObject): Array of strings
 		// advice can be: object, Function(targetObject, targetMethodName)
 		
@@ -265,7 +392,10 @@ var VERSION, ap, prepend, append, slice, isArray;
 	// Create an API function for the specified advice type
 	function adviceApi(type) {
 		return function(target, func, adviceFunc) {
-			return addAdvice(target, func, type, adviceFunc);
+			var aspect = {};
+			aspect[type] = adviceFunc;
+			
+			return addAspect(target, func, aspect);
 		};
 	}
 
@@ -287,7 +417,12 @@ var VERSION, ap, prepend, append, slice, isArray;
 	};
 
 });
-})(typeof define != 'undefined' ? define : function(deps, factory) {
-    // global aop, if not loaded via require
-    this.aop = factory();
-});
+})(typeof define != 'undefined'
+	// use define for AMD if available
+	? define
+	// If no define, look for module to export as a CommonJS module.
+	// If no define or module, attach to current context.
+	: typeof module != 'undefined'
+		? function(deps, factory) { module.exports = factory(); }
+		: function(deps, factory) { this.aop = factory(); }
+);
