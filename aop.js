@@ -62,23 +62,25 @@ define([], function() {
 		advisor = this;
 
 		this.advised = function() {
-			var args, result, afterType, exception;
+			var context, args, result, afterType, exception;
+
+            context = this;
 
 			function callOrig(args) {
-				var result = orig.apply(target, args);
-				advisor._callAdvice('on', args);
+				var result = orig.apply(context, args);
+				advisor._callAdvice('on', context, args);
 
 				return result;
 			}
 
 			function callAfter(afterType, args) {
-				advisor._callAdvice(afterType, args);
+				advisor._callAdvice(afterType, context, args);
 			}
 
 			args = argsToArray(arguments);
 			afterType = 'afterReturning';
 
-			advisor._callAdvice('before', args);
+			advisor._callAdvice('before', context, args);
 
 			try {
 				result = callOrig(args);
@@ -91,8 +93,6 @@ define([], function() {
 
 			callAfter(afterType, args);
 			callAfter('after', args);
-
-			advisor._callAdvice('after', args);
 
 			if(exception) {
 				throw exception;
@@ -108,14 +108,11 @@ define([], function() {
 		
 		// Invoke all advice functions in the supplied context, with the
 		// supplied args.
-		_callAdvice: function(adviceType, args) {
+		_callAdvice: function(adviceType, context, args) {
 
-			var iterator, context;
-			
 			// before advice runs LIFO, from most-recently added to least-recently added.
 			// All other advice is FIFO
-			iterator = iterators[adviceType];
-			context = this.target;
+			var iterator = iterators[adviceType];
 
             iterator(this.aspects, function(aspect) {
                 var advice = aspect[adviceType];
@@ -201,7 +198,8 @@ define([], function() {
 		// advice can be: object, Function(targetObject, targetMethodName)
 
 		var pointcutType, remove;
-		target = findTarget(target);
+
+        target = findTarget(target);
 
 		if (isArray(pointcut)) {
 			remove = addAspectToAll(target, pointcut, aspect);
