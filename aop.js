@@ -45,8 +45,9 @@ define([], function() {
     };
 
     // All other advice types use forward iteration
-    iterators.around
-        = iterators.on
+    // Around is a special case that uses recursion rather than
+    // iteration.  See Advisor._callAroundAdvice
+    iterators.on
         = iterators.afterReturning
         = iterators.afterThrowing
         = iterators.after
@@ -90,6 +91,7 @@ define([], function() {
 				result = advisor._callAroundAdvice(context, args, callOrig);
 			} catch(e) {
 				result = exception = e;
+                // Switch to afterThrowing
 				afterType = 'afterThrowing'
 			}
 
@@ -140,10 +142,10 @@ define([], function() {
             }
 
             function callAround(i, args) {
-                var doProceed, joinpoint;
+                var proceed, joinpoint;
 
-                doProceed = function(args) {
-                    doProceed = proceedAlreadyCalled;
+                proceed = function(args) {
+                    proceed = proceedAlreadyCalled;
                     return callNext(i-1, args);
                 };
 
@@ -151,7 +153,7 @@ define([], function() {
                     target: context,
                     args: args,
                     proceed: function() {
-                        return doProceed(arguments.length > 0 ? argsToArray(arguments) : args);
+                        return proceed(arguments.length > 0 ? argsToArray(arguments) : args);
                     }
                 };
 
@@ -174,7 +176,7 @@ define([], function() {
 			remove = function() {
 				for(var i = aspects.length; i >= 0; --i) {
 					if(aspects[i] === aspect) {
-						aspects.slice(i, 1);
+						aspects.splice(i, 1);
 					}
 				}
 			};
