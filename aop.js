@@ -7,9 +7,11 @@
 (function(define) {
 define([], function() {
 
-	var VERSION, ap, prepend, append, slice, isArray;
+	var VERSION, ap, prepend, append, slice, isArray, freeze;
 
 	VERSION = "0.5.0";
+
+    freeze = Object.freeze || function() {};
 
 	ap      = Array.prototype;
 	prepend = ap.unshift;
@@ -50,6 +52,8 @@ define([], function() {
         = iterators.after
         = forEach;
 
+    function proceedAlreadyCalled() { throw new Error("proceed() may only be called once"); }
+
 	function Advisor(target, func) {
 
 		var orig, advisor;
@@ -68,22 +72,22 @@ define([], function() {
 
 			function callOrig(args) {
 				var result = orig.apply(context, args);
-				advisor._callAdvice('on', context, args);
+				advisor._callSimpleAdvice('on', context, args);
 
 				return result;
 			}
 
 			function callAfter(afterType, args) {
-				advisor._callAdvice(afterType, context, args);
+				advisor._callSimpleAdvice(afterType, context, args);
 			}
 
 			args = argsToArray(arguments);
 			afterType = 'afterReturning';
 
-			advisor._callAdvice('before', context, args);
+			advisor._callSimpleAdvice('before', context, args);
 
 			try {
-				result = callOrig(args);
+				result = advisor._callAroundAdvice(context, args, callOrig);
 			} catch(e) {
 				result = exception = e;
 				afterType = 'afterThrowing'
@@ -108,7 +112,7 @@ define([], function() {
 		
 		// Invoke all advice functions in the supplied context, with the
 		// supplied args.
-		_callAdvice: function(adviceType, context, args) {
+		_callSimpleAdvice: function(adviceType, context, args) {
 
 			// before advice runs LIFO, from most-recently added to least-recently added.
 			// All other advice is FIFO
@@ -119,6 +123,45 @@ define([], function() {
                 advice && advice.apply(context, args);
             });
 		},
+
+        _callAroundAdvice: function(context, args, orig) {
+            var len, aspects;
+
+            aspects = this.aspects;
+            len = aspects.length;
+
+            function callNext(i, args) {
+                // Skip to next aspect that has around advice
+                while(i >= 0 && typeof aspects[i].around !== 'function') --i;
+
+                // If we exhausted all aspects, finally call the original
+                // Otherwise, if we found another around, call it
+                return (i < 0) ? orig.call(context, args) : callAround(i, args);
+            }
+
+            function callAround(i, args) {
+                var doProceed, joinpoint;
+
+                doProceed = function(args) {
+                    doProceed = proceedAlreadyCalled;
+                    return callNext(i-1, args);
+                };
+
+                joinpoint = {
+                    target: context,
+                    args: args,
+                    proceed: function() {
+                        return doProceed(arguments.length > 0 ? argsToArray(arguments) : args);
+                    }
+                };
+
+                freeze(joinpoint);
+
+                return aspects[i].around.call(context, joinpoint);
+            }
+
+            return callNext(len-1, args);
+        },
 
 		// Adds the supplied aspect to the advised target method
 		add: function(aspect) {
@@ -135,7 +178,6 @@ define([], function() {
 					}
 				}
 			};
-
 
 			return remove;
 		},
