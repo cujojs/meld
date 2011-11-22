@@ -4,8 +4,9 @@
  * to the MIT License at: http://www.opensource.org/licenses/mit-license.php.
  */
 
-(function(define) {
-define([], function() {
+// Begin AMD/Node/browser boilerplate
+(typeof define == "function" ? define : function (factory) { typeof module != 'undefined' ? (module.exports = factory()) : (this.aop = factory()); })(function() {
+// End boilerplate
 
 	var VERSION, ap, prepend, append, slice, isArray, freeze;
 
@@ -88,12 +89,12 @@ define([], function() {
 			advisor._callSimpleAdvice('before', context, args);
 
 			try {
-				result = advisor._callAroundAdvice(context, args, callOrig);
+				result = advisor._callAroundAdvice(context, func, args, callOrig);
 			} catch(e) {
 				result = exception = e;
                 // Switch to afterThrowing
-				afterType = 'afterThrowing'
-			}
+				afterType = 'afterThrowing';
+            }
 
 			args = [result];
 
@@ -111,9 +112,14 @@ define([], function() {
 	}
 
 	Advisor.prototype = {
-		
-		// Invoke all advice functions in the supplied context, with the
-		// supplied args.
+
+        /**
+         * Invoke all advice functions in the supplied context, with the supplied args
+         *
+         * @param adviceType
+         * @param context
+         * @param args
+         */
 		_callSimpleAdvice: function(adviceType, context, args) {
 
 			// before advice runs LIFO, from most-recently added to least-recently added.
@@ -126,24 +132,38 @@ define([], function() {
             });
 		},
 
-        _callAroundAdvice: function(context, args, orig) {
+        /**
+         * Invoke all around advice and then the original method
+         *
+         * @param context
+         * @param method
+         * @param args
+         * @param orig
+         */
+        _callAroundAdvice: function(context, method, args, orig) {
             var len, aspects;
 
             aspects = this.aspects;
             len = aspects.length;
 
+            // Call the next function in the around chain, which will either be
+            // another around advice, or the orig method
             function callNext(i, args) {
+                var aspect;
                 // Skip to next aspect that has around advice
-                while(i >= 0 && typeof aspects[i].around !== 'function') --i;
+                while(i >= 0 && (aspect = aspects[i]) && typeof aspect.around !== 'function') --i;
 
                 // If we exhausted all aspects, finally call the original
                 // Otherwise, if we found another around, call it
-                return (i < 0) ? orig.call(context, args) : callAround(i, args);
+                return (i < 0) ? orig.call(context, args) : callAround(aspect.around, i, args);
             }
 
-            function callAround(i, args) {
+            function callAround(around, i, args) {
                 var proceed, joinpoint;
 
+                // Create proceed function that calls the next around advice, or
+                // the original.  Overwrites itself so that it can only be called
+                // once.
                 proceed = function(args) {
                     proceed = proceedAlreadyCalled;
                     return callNext(i-1, args);
@@ -151,21 +171,29 @@ define([], function() {
 
                 joinpoint = {
                     target: context,
+                    method: method,
                     args: args,
-                    proceed: function() {
+                    proceed: function(/* newArgs */) {
+                        // if new arguments were provided, use them
                         return proceed(arguments.length > 0 ? argsToArray(arguments) : args);
                     }
                 };
 
+                // Joinpoint is immutable
                 freeze(joinpoint);
 
-                return aspects[i].around.call(context, joinpoint);
+                // Call supplied around advice function
+                return around.call(context, joinpoint);
             }
 
             return callNext(len-1, args);
         },
 
-		// Adds the supplied aspect to the advised target method
+        /**
+         * Adds the supplied aspect to the advised target method
+         *
+         * @param aspect
+         */
 		add: function(aspect) {
             
 			var aspects, remove;
@@ -184,7 +212,9 @@ define([], function() {
 			return remove;
 		},
 
-		// Removes the Advisor and thus, all aspects from the advised target method.
+        /**
+         * Removes the Advisor and thus, all aspects from the advised target method.
+         */
 		remove: function() {
 			this.target[this.func]._advisor = null;
 			this.target[this.func] = this.orig;
@@ -305,19 +335,7 @@ define([], function() {
 		on:             adviceApi('on'),
 		afterReturning: adviceApi('afterReturning'),
 		afterThrowing:  adviceApi('afterThrowing'),
-		after:          adviceApi('after'),
-
-		// Version
-		version:        VERSION
+		after:          adviceApi('after')
 	};
 
 });
-})(typeof define != 'undefined'
-	// use define for AMD if available
-	? define
-	// If no define, look for module to export as a CommonJS module.
-	// If no define or module, attach to current context.
-	: typeof module != 'undefined'
-		? function(deps, factory) { module.exports = factory(); }
-		: function(deps, factory) { this.aop = factory(); }
-);
