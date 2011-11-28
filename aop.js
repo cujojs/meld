@@ -196,20 +196,19 @@
          */
 		add: function(aspect) {
             
-			var aspects, remove;
-			
-			aspects = this.aspects;
-			aspects.push(aspect);
+			var aspects = this.aspects;
 
-			remove = function() {
-				for(var i = aspects.length; i >= 0; --i) {
-					if(aspects[i] === aspect) {
-						aspects.splice(i, 1);
-					}
-				}
-			};
+            aspects.push(aspect);
 
-			return remove;
+            return {
+                remove: function() {
+                    for (var i = aspects.length; i >= 0; --i) {
+                        if (aspects[i] === aspect) {
+                            aspects.splice(i, 1);
+                        }
+                    }
+                }
+            };
 		},
 
         /**
@@ -260,12 +259,14 @@
 			removers.push(addAspectToMethod(target, f, aspect));
 		}
 
-		return function() {
-			for (var i=removers.length-1; i>=0; i--) {
-				removers[i]();
-			}
-		}
-	}
+		return {
+            remove: function() {
+                for (var i = removers.length - 1; i >= 0; i--) {
+                    removers[i]();
+                }
+            }
+        };
+    }
 
 	function addAspect(target, pointcut, aspect) {
 		// pointcut can be: string, Array of strings, RegExp, Function(targetObject): Array of strings
