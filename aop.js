@@ -196,7 +196,10 @@
          */
 		add: function(aspect) {
             
-			var aspects = this.aspects;
+			var aspects, advisor;
+
+            advisor = this;
+            aspects = advisor.aspects;
 
             aspects.push(aspect);
 
@@ -205,7 +208,13 @@
                     for (var i = aspects.length; i >= 0; --i) {
                         if (aspects[i] === aspect) {
                             aspects.splice(i, 1);
+                            break;
                         }
+                    }
+
+                    // If there are no aspects left, restore the original method
+                    if(!aspects.length) {
+                        advisor.remove();
                     }
                 }
             };

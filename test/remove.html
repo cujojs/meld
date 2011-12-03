@@ -19,8 +19,22 @@
                 }
             }
 
-			doh.register('before', [
-				function testRemove1() {
+			doh.register('remove', [
+                function testRemove() {
+                    // Just test that the advisor is added, and then
+                    // removed when the final aspect is removed
+                    var fixture, ref;
+
+                    fixture = new Fixture();
+                    ref = aop.before(fixture, 'method', increment);
+
+                    doh.assertTrue(!!fixture.method._advisor);
+
+                    ref.remove();
+
+                    doh.assertEqual(undef, fixture.method._advisor);
+                },
+                function testRemove1() {
 					var fixture, ref;
                     
                     fixture = new Fixture();
