@@ -252,26 +252,23 @@
 	function addAspectToMethod(target, method, aspect) {
 		var advisor = Advisor.get(target, method);
 
-		if(advisor) {
-			return advisor.add(aspect);
-		} else {
-			throw new Error('Target does not have method: ' + method);
-		}
+		return advisor && advisor.add(aspect);
 	}
 
 	function addAspectToAll(target, methodArray, aspect) {
-		var removers, f, i;
+		var removers, added, f, i;
 
 		removers = [];
 		i = 0;
 		while((f = methodArray[i++])) {
-			removers.push(addAspectToMethod(target, f, aspect));
+            added = addAspectToMethod(target, f, aspect);
+            added && removers.push(added);
 		}
 
 		return {
             remove: function() {
-                for (var i = removers.length - 1; i >= 0; i--) {
-                    removers[i]();
+                for (var i = removers.length - 1; i >= 0; --i) {
+                    removers[i].remove();
                 }
             }
         };
