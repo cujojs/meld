@@ -11,6 +11,8 @@
 	var VERSION, ap, prepend, append, slice, isArray, freeze;
 
 	VERSION = "0.5.0";
+    
+    function noop() {}
 
     freeze = Object.freeze || function() {};
 
@@ -58,7 +60,7 @@
 
 	function Advisor(target, func) {
 
-		var orig, advisor;
+		var orig, advisor, advised;
 
 		this.target = target;
 		this.func = func;
@@ -67,7 +69,7 @@
 		orig = this.orig = target[func];
 		advisor = this;
 
-		this.advised = function() {
+		advisor.advised = advised = function() {
 			var context, args, result, afterType, exception;
 
             context = this;
@@ -107,8 +109,14 @@
 
 			return result;
 		};
+        
+        for(var p in orig) {
+            if(orig[p] !== advised[p] && !(p in noop)) {
+                advised[p] = orig[p];
+            }
+        }
 
-		this.advised._advisor = this;
+		advised._advisor = this;
 	}
 
 	Advisor.prototype = {
