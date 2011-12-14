@@ -11,6 +11,8 @@
 	var VERSION, ap, prepend, append, slice, isArray, freeze;
 
 	VERSION = "0.5.0";
+    
+    function noop() {}
 
     freeze = Object.freeze || function() {};
 
@@ -23,10 +25,24 @@
 		return Object.prototype.toString.call(it) == '[object Array]';
 	};
 
-	// Helper to convert arguments to an array
+    /**
+     * Helper to convert arguments to an array
+     * @param a {Arguments} arguments
+     * @return {Array}
+     */
 	function argsToArray(a) {
 		return slice.call(a);
 	}
+
+    function copyFunctionProps(to, from) {
+        for(var p in from) {
+            if(from[p] !== to[p] && !(p in noop)) {
+                to[p] = from[p];
+            }
+        }
+
+        to.prototype = from.prototype;
+    }
 
 	function forEach(array, func) {
         for(var i=0, len=array.length; i<len; ++i) {
@@ -58,7 +74,7 @@
 
 	function Advisor(target, func) {
 
-		var orig, advisor;
+		var orig, advisor, advised;
 
 		this.target = target;
 		this.func = func;
@@ -67,7 +83,7 @@
 		orig = this.orig = target[func];
 		advisor = this;
 
-		this.advised = function() {
+		advisor.advised = advised = function() {
 			var context, args, result, afterType, exception;
 
             context = this;
@@ -107,8 +123,10 @@
 
 			return result;
 		};
-
-		this.advised._advisor = this;
+        
+        copyFunctionProps(advised, orig);
+        
+		advised._advisor = this;
 	}
 
 	Advisor.prototype = {
@@ -146,8 +164,12 @@
             aspects = this.aspects;
             len = aspects.length;
 
-            // Call the next function in the around chain, which will either be
-            // another around advice, or the orig method
+            /**
+             * Call the next function in the around chain, which will either be another around
+             * advice, or the orig method.
+             * @param i {Number} index of the around advice
+             * @param args {Array} arguments with with to call the next around advice
+             */
             function callNext(i, args) {
                 var aspect;
                 // Skip to next aspect that has around advice
@@ -161,9 +183,10 @@
             function callAround(around, i, args) {
                 var proceed, joinpoint;
 
-                // Create proceed function that calls the next around advice, or
-                // the original.  Overwrites itself so that it can only be called
-                // once.
+                /**
+                 * Create proceed function that calls the next around advice, or the original.  Overwrites itself so that it can only be called once.
+                 * @param [args] {Array} optional arguments to use instead of the original arguments
+                 */
                 proceed = function(args) {
                     proceed = proceedAlreadyCalled;
                     return callNext(i-1, args);
@@ -221,10 +244,20 @@
 		},
 
         /**
-         * Removes the Advisor and thus, all aspects from the advised target method.
+         * Removes the Advisor and thus, all aspects from the advised target method, and
+         * restores the original target method, copying back all properties that may have
+         * been added or updated on the advised function.
          */
 		remove: function() {
-			this.target[this.func]._advisor = null;
+            var advised, orig;
+
+            advised = this.advised;
+            orig = this.orig;
+
+            delete advised._advisor;
+            
+            copyFunctionProps(orig, advised);
+
 			this.target[this.func] = this.orig;
 		}
 	};
@@ -252,26 +285,23 @@
 	function addAspectToMethod(target, method, aspect) {
 		var advisor = Advisor.get(target, method);
 
-		if(advisor) {
-			return advisor.add(aspect);
-		} else {
-			throw new Error('Target does not have method: ' + method);
-		}
+		return advisor && advisor.add(aspect);
 	}
 
 	function addAspectToAll(target, methodArray, aspect) {
-		var removers, f, i;
+		var removers, added, f, i;
 
 		removers = [];
 		i = 0;
 		while((f = methodArray[i++])) {
-			removers.push(addAspectToMethod(target, f, aspect));
+            added = addAspectToMethod(target, f, aspect);
+            added && removers.push(added);
 		}
 
 		return {
             remove: function() {
-                for (var i = removers.length - 1; i >= 0; i--) {
-                    removers[i]();
+                for (var i = removers.length - 1; i >= 0; --i) {
+                    removers[i].remove();
                 }
             }
         };
