@@ -11,8 +11,6 @@
 	var VERSION, ap, prepend, append, slice, isArray, freeze;
 
 	VERSION = "0.5.0";
-    
-    function noop() {}
 
     freeze = Object.freeze || function() {};
 
@@ -34,17 +32,7 @@
 		return slice.call(a);
 	}
 
-    function copyFunctionProps(to, from) {
-        for(var p in from) {
-            if(from[p] !== to[p] && !(p in noop)) {
-                to[p] = from[p];
-            }
-        }
-
-        to.prototype = from.prototype;
-    }
-
-	function forEach(array, func) {
+    function forEach(array, func) {
         for(var i=0, len=array.length; i<len; ++i) {
             func(array[i]);
         }
@@ -83,7 +71,7 @@
 		orig = this.orig = target[func];
 		advisor = this;
 
-		advisor.advised = advised = function() {
+		advised = this.advised = function() {
 			var context, args, result, afterType, exception;
 
             context = this;
@@ -123,9 +111,7 @@
 
 			return result;
 		};
-        
-        copyFunctionProps(advised, orig);
-        
+
 		advised._advisor = this;
 	}
 
@@ -249,15 +235,7 @@
          * been added or updated on the advised function.
          */
 		remove: function() {
-            var advised, orig;
-
-            advised = this.advised;
-            orig = this.orig;
-
-            delete advised._advisor;
-            
-            copyFunctionProps(orig, advised);
-
+            delete this.advised._advisor;
 			this.target[this.func] = this.orig;
 		}
 	};
