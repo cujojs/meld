@@ -1,7 +1,7 @@
 {
     "name": "aop",
     "version": "0.5",
-    "description": "A light, fast, flexible Javascript IOC container.",
+    "description": "AOP for JS with before, on, afterReturning, afterThrowing, after advice, and pointcut support",
     "keywords": ["aop"],
     "licenses": [
         {
