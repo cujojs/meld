@@ -10,7 +10,7 @@
 
 	var VERSION, ap, prepend, append, slice, isArray, freeze;
 
-	VERSION = "0.5.0";
+	VERSION = "0.5.1";
 
     freeze = Object.freeze || function() {};
 
