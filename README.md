@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### v.5.2
+
+* Revert to larger, more builder-friendly module boilerplate.  No functional change.
+
 ### v0.5.1
 
 * Minor corrections and updates to `package.json`
