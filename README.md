@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### v.5.2
+### v0.5.2
 
 * Revert to larger, more builder-friendly module boilerplate.  No functional change.
 
