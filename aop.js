@@ -1,21 +1,16 @@
+/** @license MIT License (c) copyright B Cavalier & J Hann */
+
 /**
-* aop - Aspect Oriented Programming for Javascript
-*
-* (c) copyright 2011-2012 Brian Cavalier and John Hann
-*
-* aop is part of the cujo.js family of libraries (http://cujojs.com/)
-*
-* Licensed under the MIT License at:
-* http://www.opensource.org/licenses/mit-license.php
-*
-*/
-/**
- * aop.js
+ * aop
+ * Aspect Oriented Programming for Javascript
+ *
+ * aop is part of the cujo.js family of libraries (http://cujojs.com/)
+ *
+ * Licensed under the MIT License at:
+ * http://www.opensource.org/licenses/mit-license.php
  *
  * @version 0.5.2
- * @author brian@hovercraftstudios.com
  */
-
 (function (define) {
 define(function () {
 
