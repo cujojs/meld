@@ -29,42 +29,42 @@ define(function () {
         return Object.prototype.toString.call(it) == '[object Array]';
     };
 
-       /**
-        * Helper to convert arguments to an array
-        * @param a {Arguments} arguments
-        * @return {Array}
-        */
+    /**
+     * Helper to convert arguments to an array
+     * @param a {Arguments} arguments
+     * @return {Array}
+     */
     function argsToArray(a) {
         return slice.call(a);
     }
 
-       function forEach(array, func) {
-           for(var i=0, len=array.length; i<len; ++i) {
-               func(array[i]);
-           }
+    function forEach(array, func) {
+        for (var i = 0, len = array.length; i < len; ++i) {
+            func(array[i]);
+        }
     }
 
     function forEachReverse(array, func) {
-           for(var i=array.length-1; i>=0; --i) {
-               func(array[i]);
-           }
+        for (var i = array.length - 1; i >= 0; --i) {
+            func(array[i]);
+        }
     }
 
-       var iterators = {
+    var iterators = {
            // Before uses reverse iteration
            before: forEachReverse
        };
 
-       // All other advice types use forward iteration
-       // Around is a special case that uses recursion rather than
-       // iteration.  See Advisor._callAroundAdvice
-       iterators.on
-           = iterators.afterReturning
-           = iterators.afterThrowing
-           = iterators.after
-           = forEach;
+    // All other advice types use forward iteration
+    // Around is a special case that uses recursion rather than
+    // iteration.  See Advisor._callAroundAdvice
+    iterators.on
+        = iterators.afterReturning
+        = iterators.afterThrowing
+        = iterators.after
+        = forEach;
 
-       function proceedAlreadyCalled() { throw new Error("proceed() may only be called once"); }
+    function proceedAlreadyCalled() { throw new Error("proceed() may only be called once"); }
 
     function Advisor(target, func) {
 
@@ -142,71 +142,71 @@ define(function () {
                });
         },
 
-           /**
-            * Invoke all around advice and then the original method
-            *
-            * @param context
-            * @param method
-            * @param args
-            * @param orig
-            */
-           _callAroundAdvice: function(context, method, args, orig) {
-               var len, aspects;
+        /**
+         * Invoke all around advice and then the original method
+         *
+         * @param context
+         * @param method
+         * @param args
+         * @param orig
+         */
+        _callAroundAdvice:function (context, method, args, orig) {
+            var len, aspects;
 
-               aspects = this.aspects;
-               len = aspects.length;
+            aspects = this.aspects;
+            len = aspects.length;
 
-               /**
-                * Call the next function in the around chain, which will either be another around
-                * advice, or the orig method.
-                * @param i {Number} index of the around advice
-                * @param args {Array} arguments with with to call the next around advice
-                */
-               function callNext(i, args) {
-                   var aspect;
-                   // Skip to next aspect that has around advice
-                   while(i >= 0 && (aspect = aspects[i]) && typeof aspect.around !== 'function') --i;
+            /**
+             * Call the next function in the around chain, which will either be another around
+             * advice, or the orig method.
+             * @param i {Number} index of the around advice
+             * @param args {Array} arguments with with to call the next around advice
+             */
+            function callNext(i, args) {
+                var aspect;
+                // Skip to next aspect that has around advice
+                while (i >= 0 && (aspect = aspects[i]) && typeof aspect.around !== 'function') --i;
 
-                   // If we exhausted all aspects, finally call the original
-                   // Otherwise, if we found another around, call it
-                   return (i < 0) ? orig.call(context, args) : callAround(aspect.around, i, args);
-               }
+                // If we exhausted all aspects, finally call the original
+                // Otherwise, if we found another around, call it
+                return (i < 0) ? orig.call(context, args) : callAround(aspect.around, i, args);
+            }
 
-               function callAround(around, i, args) {
-                   var proceed, joinpoint;
+            function callAround(around, i, args) {
+                var proceed, joinpoint;
 
-                   /**
-                    * Create proceed function that calls the next around advice, or the original.  Overwrites itself so that it can only be called once.
-                    * @param [args] {Array} optional arguments to use instead of the original arguments
-                    */
-                   proceed = function(args) {
-                       proceed = proceedAlreadyCalled;
-                       return callNext(i-1, args);
-                   };
+                /**
+                 * Create proceed function that calls the next around advice, or the original.  Overwrites itself so that it can only be called once.
+                 * @param [args] {Array} optional arguments to use instead of the original arguments
+                 */
+                proceed = function (args) {
+                    proceed = proceedAlreadyCalled;
+                    return callNext(i - 1, args);
+                };
 
-                   // Joinpoint is immutable
-                   joinpoint = freeze({
-                       target: context,
-                       method: method,
-                       args: args,
-                       proceed: function(/* newArgs */) {
-                           // if new arguments were provided, use them
-                           return proceed(arguments.length > 0 ? argsToArray(arguments) : args);
-                       }
-                   });
+                // Joinpoint is immutable
+                joinpoint = freeze({
+                    target:context,
+                    method:method,
+                    args:args,
+                    proceed:function (/* newArgs */) {
+                        // if new arguments were provided, use them
+                        return proceed(arguments.length > 0 ? argsToArray(arguments) : args);
+                    }
+                });
 
-                   // Call supplied around advice function
-                   return around.call(context, joinpoint);
-               }
+                // Call supplied around advice function
+                return around.call(context, joinpoint);
+            }
 
-               return callNext(len-1, args);
-           },
+            return callNext(len - 1, args);
+        },
 
-           /**
-            * Adds the supplied aspect to the advised target method
-            *
-            * @param aspect
-            */
+        /**
+         * Adds the supplied aspect to the advised target method
+         *
+         * @param aspect
+         */
         add: function(aspect) {
 
             var aspects, advisor;
@@ -233,11 +233,11 @@ define(function () {
                };
         },
 
-           /**
-            * Removes the Advisor and thus, all aspects from the advised target method, and
-            * restores the original target method, copying back all properties that may have
-            * been added or updated on the advised function.
-            */
+        /**
+         * Removes the Advisor and thus, all aspects from the advised target method, and
+         * restores the original target method, copying back all properties that may have
+         * been added or updated on the advised function.
+         */
         remove: function() {
                delete this.advised._advisor;
             this.target[this.func] = this.orig;
@@ -330,9 +330,9 @@ define(function () {
 
     }
 
-       function findTarget(target) {
-           return target.prototype || target;
-       }
+    function findTarget(target) {
+        return target.prototype || target;
+    }
 
     // Create an API function for the specified advice type
     function adviceApi(type) {
@@ -366,7 +366,7 @@ define(function () {
     : function (factory) {
     typeof module != 'undefined'
         ? (module.exports = factory())
-        : (this.when = factory());
+        : (this.aop = factory());
     }
     // Boilerplate for AMD, Node, and browser global
 );
