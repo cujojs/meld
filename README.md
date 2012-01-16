@@ -1,3 +1,19 @@
+Please Note: this project has moved from briancavalier/aop to cujojs/aop.
+Any existing forks have been automatically moved to cujojs/aop. However,
+you'll need to update your clone and submodule remotes manually.
+
+Update the url in your .git/config, and also .gitmodules for submodules:
+
+```
+git://github.com/cujojs/aop.git
+https://cujojs@github.com/cujojs/aop.git
+```
+
+Helpful link for updating submodules:
+[Git Submodules: Adding, Using, Removing, Updating](http://chrisjean.com/2009/04/20/git-submodules-adding-using-removing-and-updating/)
+
+----
+
 [Aspect Oriented Programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming "Aspect-oriented programming - Wikipedia, the free encyclopedia") for Javascript.
 
 ## Changelog
