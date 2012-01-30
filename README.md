@@ -18,6 +18,11 @@ Helpful link for updating submodules:
 
 ## Changelog
 
+### v0.5.3
+
+* First official release as part of [cujojs](http://github.com/cujojs)
+* Minor doc and package.json tweaks
+
 ### v0.5.2
 
 * Revert to larger, more builder-friendly module boilerplate.  No functional change.
