@@ -9,14 +9,12 @@
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @version 0.5.2
+ * @version 0.5.3
  */
 (function (define) {
 define(function () {
 
-    var VERSION, ap, prepend, append, slice, isArray, freeze;
-
-    VERSION = "0.5.2";
+    var ap, prepend, append, slice, isArray, freeze;
 
     freeze = Object.freeze || function (o) { return o; };
 
