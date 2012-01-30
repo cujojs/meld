@@ -148,7 +148,7 @@ define(function () {
          * @param args
          * @param orig
          */
-        _callAroundAdvice:function (context, method, args, orig) {
+        _callAroundAdvice: function (context, method, args, orig) {
             var len, aspects;
 
             aspects = this.aspects;
@@ -184,10 +184,10 @@ define(function () {
 
                 // Joinpoint is immutable
                 joinpoint = freeze({
-                    target:context,
-                    method:method,
-                    args:args,
-                    proceed:function (/* newArgs */) {
+                    target: context,
+                    method: method,
+                    args: args,
+                    proceed: function (/* newArgs */) {
                         // if new arguments were provided, use them
                         return proceed(arguments.length > 0 ? argsToArray(arguments) : args);
                     }
@@ -236,8 +236,8 @@ define(function () {
          * restores the original target method, copying back all properties that may have
          * been added or updated on the advised function.
          */
-        remove: function() {
-               delete this.advised._advisor;
+        remove: function () {
+            delete this.advised._advisor;
             this.target[this.func] = this.orig;
         }
     };
