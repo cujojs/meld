@@ -109,7 +109,7 @@ buster.testCase('before', {
 		// Make sure the return value is preserved
 		assert.equals(ret, target.val);
 	}
-})
+});
 
 })(
 	require('buster'),
