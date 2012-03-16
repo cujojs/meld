@@ -209,26 +209,26 @@ define(function () {
 
 			var aspects, advisor;
 
-			   advisor = this;
-			   aspects = advisor.aspects;
+			advisor = this;
+			aspects = advisor.aspects;
 
-			   aspects.push(aspect);
+			aspects.push(aspect);
 
-			   return {
-				   remove: function() {
-					   for (var i = aspects.length; i >= 0; --i) {
-						   if (aspects[i] === aspect) {
-							   aspects.splice(i, 1);
-							   break;
-						   }
-					   }
+			return {
+				remove: function () {
+					for (var i = aspects.length; i >= 0; --i) {
+						if (aspects[i] === aspect) {
+							aspects.splice(i, 1);
+							break;
+						}
+					}
 
-					   // If there are no aspects left, restore the original method
-					   if(!aspects.length) {
-						   advisor.remove();
-					   }
-				   }
-			   };
+					// If there are no aspects left, restore the original method
+					if (!aspects.length) {
+						advisor.remove();
+					}
+				}
+			};
 		},
 
 		/**
