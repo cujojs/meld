@@ -25,7 +25,7 @@ Fixture.prototype = {
 	}
 };
 
-buster.testCase('before', {
+buster.testCase('after', {
 	'should invoke advice after advised method': function() {
 		var target = new Fixture();
 
