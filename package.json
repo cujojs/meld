@@ -1,6 +1,6 @@
 {
 	"name": "aop",
-	"version": "0.5.3",
+	"version": "0.5.4",
 	"description": "AOP for JS with before, on, afterReturning, afterThrowing, after advice, and pointcut support",
 	"keywords": ["aop"],
 	"licenses": [

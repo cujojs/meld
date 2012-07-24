@@ -1,2 +1,4 @@
 .idea/
 .npmignore
+node_modules/
+experiments/

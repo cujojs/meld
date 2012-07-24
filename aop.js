@@ -9,12 +9,12 @@
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @version 0.5.3
+ * @version 0.5.4
  */
 (function (define) {
 define(function () {
 
-	var ap, prepend, append, slice, isArray, freeze;
+	var ap, prepend, append, iterators, slice, isArray, defineProperty, freeze;
 
 	freeze = Object.freeze || function (o) { return o; };
 
@@ -27,31 +27,14 @@ define(function () {
 		return Object.prototype.toString.call(it) == '[object Array]';
 	};
 
-	/**
-	 * Helper to convert arguments to an array
-	 * @param a {Arguments} arguments
-	 * @return {Array}
-	 */
-	function argsToArray(a) {
-		return slice.call(a);
-	}
+	defineProperty = Object.defineProperty || function(obj, prop, descriptor) {
+		obj[prop] = descriptor.value;
+	};
 
-	function forEach(array, func) {
-		for (var i = 0, len = array.length; i < len; ++i) {
-			func(array[i]);
-		}
-	}
-
-	function forEachReverse(array, func) {
-		for (var i = array.length - 1; i >= 0; --i) {
-			func(array[i]);
-		}
-	}
-
-	var iterators = {
-		   // Before uses reverse iteration
-		   before: forEachReverse
-	   };
+	iterators = {
+		// Before uses reverse iteration
+		before: forEachReverse
+	};
 
 	// All other advice types use forward iteration
 	// Around is a special case that uses recursion rather than
@@ -62,15 +45,13 @@ define(function () {
 		= iterators.after
 		= forEach;
 
-	function proceedAlreadyCalled() { throw new Error("proceed() may only be called once"); }
-
 	function Advisor(target, func) {
 
 		var orig, advisor, advised;
 
 		this.target = target;
 		this.func = func;
-		   this.aspects = [];
+		this.aspects = [];
 
 		orig = this.orig = target[func];
 		advisor = this;
@@ -78,7 +59,7 @@ define(function () {
 		advised = this.advised = function() {
 			var context, args, result, afterType, exception;
 
-			   context = this;
+			context = this;
 
 			function callOrig(args) {
 				var result = orig.apply(context, args);
@@ -100,9 +81,9 @@ define(function () {
 				result = advisor._callAroundAdvice(context, func, args, callOrig);
 			} catch(e) {
 				result = exception = e;
-				   // Switch to afterThrowing
+				// Switch to afterThrowing
 				afterType = 'afterThrowing';
-			   }
+			}
 
 			args = [result];
 
@@ -116,7 +97,7 @@ define(function () {
 			return result;
 		};
 
-		advised._advisor = this;
+		defineProperty(advised, '_advisor', { value: this });
 	}
 
 	Advisor.prototype = {
@@ -134,10 +115,10 @@ define(function () {
 			// All other advice is FIFO
 			var iterator = iterators[adviceType];
 
-			   iterator(this.aspects, function(aspect) {
-				   var advice = aspect[adviceType];
-				   advice && advice.apply(context, args);
-			   });
+			iterator(this.aspects, function(aspect) {
+				var advice = aspect[adviceType];
+				advice && advice.apply(context, args);
+			});
 		},
 
 		/**
@@ -262,6 +243,25 @@ define(function () {
 		return advisor;
 	};
 
+	//
+	// Public API
+	//
+
+	return {
+		// General add aspect
+		// Returns a function that will remove the newly-added aspect
+		add:            addAspect,
+
+		// Add a single, specific type of advice
+		// returns a function that will remove the newly-added advice
+		before:         adviceApi('before'),
+		around:         adviceApi('around'),
+		on:             adviceApi('on'),
+		afterReturning: adviceApi('afterReturning'),
+		afterThrowing:  adviceApi('afterThrowing'),
+		after:          adviceApi('after')
+	};
+
 	function addAspectToMethod(target, method, aspect) {
 		var advisor = Advisor.get(target, method);
 
@@ -274,18 +274,18 @@ define(function () {
 		removers = [];
 		i = 0;
 		while((f = methodArray[i++])) {
-			   added = addAspectToMethod(target, f, aspect);
-			   added && removers.push(added);
+			added = addAspectToMethod(target, f, aspect);
+			added && removers.push(added);
 		}
 
 		return {
-			   remove: function() {
-				   for (var i = removers.length - 1; i >= 0; --i) {
-					   removers[i].remove();
-				   }
-			   }
-		   };
-	   }
+			remove: function() {
+				for (var i = removers.length - 1; i >= 0; --i) {
+					removers[i].remove();
+				}
+			}
+		};
+	}
 
 	function addAspect(target, pointcut, aspect) {
 		// pointcut can be: string, Array of strings, RegExp, Function(targetObject): Array of strings
@@ -293,7 +293,7 @@ define(function () {
 
 		var pointcutType, remove;
 
-		   target = findTarget(target);
+		target = findTarget(target);
 
 		if (isArray(pointcut)) {
 			remove = addAspectToAll(target, pointcut, aspect);
@@ -342,27 +342,33 @@ define(function () {
 		};
 	}
 
-	// Public API
-	return {
-		// General add aspect
-		// Returns a function that will remove the newly-added aspect
-		add:            addAspect,
+	/**
+	 * Helper to convert arguments to an array
+	 * @param a {Arguments} arguments
+	 * @return {Array}
+	 */
+	function argsToArray(a) {
+		return slice.call(a);
+	}
 
-		// Add a single, specific type of advice
-		// returns a function that will remove the newly-added advice
-		before:         adviceApi('before'),
-		around:         adviceApi('around'),
-		on:             adviceApi('on'),
-		afterReturning: adviceApi('afterReturning'),
-		afterThrowing:  adviceApi('afterThrowing'),
-		after:          adviceApi('after')
-	};
+	function forEach(array, func) {
+		for (var i = 0, len = array.length; i < len; ++i) {
+			func(array[i]);
+		}
+	}
+
+	function forEachReverse(array, func) {
+		for (var i = array.length - 1; i >= 0; --i) {
+			func(array[i]);
+		}
+	}
+
+	function proceedAlreadyCalled() { throw new Error("proceed() may only be called once"); }
 
 });
 })(typeof define == 'function'
 	? define
-	: function (factory) {
-	typeof module != 'undefined'
+	: function (factory) { typeof module != 'undefined'
 		? (module.exports = factory())
 		: (this.aop = factory());
 	}
