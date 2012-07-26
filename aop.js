@@ -149,7 +149,7 @@ define(function () {
 			function callNext(i, args) {
 				// If we exhausted all aspects, finally call the original
 				// Otherwise, if we found another around, call it
-				return (i < 0)
+				return i < 0
 					? applyOriginal(args)
 					: callAround(aspects[i].advice, i, args);
 			}
