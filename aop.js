@@ -60,18 +60,6 @@ define(function () {
 			var context, args, result, afterType, exception;
 
 			context = this;
-
-			function callOrig(args) {
-				var result = orig.apply(context, args);
-				advisor._callSimpleAdvice('on', context, args);
-
-				return result;
-			}
-
-			function callAfter(afterType, args) {
-				advisor._callSimpleAdvice(afterType, context, args);
-			}
-
 			args = argsToArray(arguments);
 			afterType = 'afterReturning';
 
@@ -95,9 +83,20 @@ define(function () {
 			}
 
 			return result;
+
+			function callOrig(args) {
+				var result = orig.apply(context, args);
+				advisor._callSimpleAdvice('on', context, args);
+
+				return result;
+			}
+
+			function callAfter(afterType, args) {
+				advisor._callSimpleAdvice(afterType, context, args);
+			}
 		};
 
-		defineProperty(advised, '_advisor', { value: this });
+		defineProperty(advised, '_advisor', { value: advisor });
 	}
 
 	Advisor.prototype = {
