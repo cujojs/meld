@@ -33,7 +33,8 @@ define(function () {
 
 	iterators = {
 		// Before uses reverse iteration
-		before: forEachReverse
+		before: forEachReverse,
+		around: false
 	};
 
 	// All other advice types use forward iteration
@@ -51,7 +52,7 @@ define(function () {
 
 		this.target = target;
 		this.func = func;
-		this.aspects = [];
+		this.aspects = {};
 
 		orig = this.orig = target[func];
 		advisor = this;
@@ -112,10 +113,15 @@ define(function () {
 
 			// before advice runs LIFO, from most-recently added to least-recently added.
 			// All other advice is FIFO
-			var iterator = iterators[adviceType];
+			var iterator, advices;
 
-			iterator(this.aspects, function(aspect) {
-				var advice = aspect[adviceType];
+			advices = this.aspects[adviceType];
+			if(!advices) return;
+
+			iterator = iterators[adviceType];
+
+			iterator(this.aspects[adviceType], function(aspect) {
+				var advice = aspect.advice;
 				advice && advice.apply(context, args);
 			});
 		},
@@ -126,13 +132,13 @@ define(function () {
 		 * @param context
 		 * @param method
 		 * @param args
-		 * @param orig
+		 * @param applyOriginal
 		 */
-		_callAroundAdvice: function (context, method, args, orig) {
+		_callAroundAdvice: function (context, method, args, applyOriginal) {
 			var len, aspects;
 
-			aspects = this.aspects;
-			len = aspects.length;
+			aspects = this.aspects.around;
+			len = aspects ? aspects.length : 0;
 
 			/**
 			 * Call the next function in the around chain, which will either be another around
@@ -141,13 +147,11 @@ define(function () {
 			 * @param args {Array} arguments with with to call the next around advice
 			 */
 			function callNext(i, args) {
-				var aspect;
-				// Skip to next aspect that has around advice
-				while (i >= 0 && (aspect = aspects[i]) && typeof aspect.around !== 'function') --i;
-
 				// If we exhausted all aspects, finally call the original
 				// Otherwise, if we found another around, call it
-				return (i < 0) ? orig.call(context, args) : callAround(aspect.around, i, args);
+				return (i < 0)
+					? applyOriginal(args)
+					: callAround(aspects[i].advice, i, args);
 			}
 
 			function callAround(around, i, args) {
@@ -167,14 +171,20 @@ define(function () {
 					target: context,
 					method: method,
 					args: args,
-					proceed: function (/* newArgs */) {
-						// if new arguments were provided, use them
-						return proceed(arguments.length > 0 ? argsToArray(arguments) : args);
-					}
+					proceed: proceedCall,
+					proceedApply: proceedApply
 				});
 
 				// Call supplied around advice function
 				return around.call(context, joinpoint);
+
+				function proceedCall() {
+					return proceed(arguments.length > 0 ? argsToArray(arguments) : args);
+				}
+
+				function proceedApply(newArgs) {
+					return proceed(newArgs || args);
+				}
 			}
 
 			return callNext(len - 1, args);
@@ -187,24 +197,45 @@ define(function () {
 		 */
 		add: function(aspect) {
 
-			var aspects, advisor;
+			var aspects, advisor, adviceType, advice, advices;
 
 			advisor = this;
 			aspects = advisor.aspects;
 
-			aspects.push(aspect);
+			for(adviceType in iterators) {
+				advice = aspect[adviceType];
+
+				if(advice) {
+					advices = aspects[adviceType];
+					if(!advices) aspects[adviceType] = advices = [];
+					advices.push({
+						aspect: aspect,
+						advice: advice
+					});
+				}
+			}
+
+//			aspects.push(aspect);
 
 			return {
 				remove: function () {
-					for (var i = aspects.length; i >= 0; --i) {
-						if (aspects[i] === aspect) {
-							aspects.splice(i, 1);
-							break;
+					var adviceType, advices, count;
+
+					for(adviceType in iterators) {
+						advices = aspects[adviceType];
+						count += advices.length;
+
+						for (var i = advices.length; i >= 0; --i) {
+							if (advices[i].aspect === aspect) {
+								advices.splice(i, 1);
+								--count;
+								break;
+							}
 						}
 					}
 
 					// If there are no aspects left, restore the original method
-					if (!aspects.length) {
+					if (!count) {
 						advisor.remove();
 					}
 				}
