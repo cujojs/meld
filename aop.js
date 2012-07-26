@@ -221,15 +221,19 @@ define(function () {
 				remove: function () {
 					var adviceType, advices, count;
 
+					count = 0;
+
 					for(adviceType in iterators) {
 						advices = aspects[adviceType];
-						count += advices.length;
+						if(advices) {
+							count += advices.length;
 
-						for (var i = advices.length; i >= 0; --i) {
-							if (advices[i].aspect === aspect) {
-								advices.splice(i, 1);
-								--count;
-								break;
+							for (var i = advices.length - 1; i >= 0; --i) {
+								if (advices[i].aspect === aspect) {
+									advices.splice(i, 1);
+									--count;
+									break;
+								}
 							}
 						}
 					}
@@ -292,38 +296,13 @@ define(function () {
 		after:          adviceApi('after')
 	};
 
-	function addAspectToMethod(target, method, aspect) {
-		var advisor = Advisor.get(target, method);
-
-		return advisor && advisor.add(aspect);
-	}
-
-	function addAspectToAll(target, methodArray, aspect) {
-		var removers, added, f, i;
-
-		removers = [];
-		i = 0;
-		while((f = methodArray[i++])) {
-			added = addAspectToMethod(target, f, aspect);
-			added && removers.push(added);
-		}
-
-		return {
-			remove: function() {
-				for (var i = removers.length - 1; i >= 0; --i) {
-					removers[i].remove();
-				}
-			}
-		};
-	}
-
 	function addAspect(target, pointcut, aspect) {
 		// pointcut can be: string, Array of strings, RegExp, Function(targetObject): Array of strings
 		// advice can be: object, Function(targetObject, targetMethodName)
 
 		var pointcutType, remove;
 
-		target = findTarget(target);
+		target = getPointcutTarget(target);
 
 		if (isArray(pointcut)) {
 			remove = addAspectToAll(target, pointcut, aspect);
@@ -340,17 +319,7 @@ define(function () {
 				remove = addAspectToAll(target, pointcut(target), aspect);
 
 			} else {
-				// Assume the pointcut is a RegExp
-				for (var p in target) {
-					// TODO: Decide whether hasOwnProperty is correct here
-					// Only apply to own properties that are functions, and match the pointcut regexp
-					if (typeof target[p] === 'function' && pointcut.test(p)) {
-						// if(object.hasOwnProperty(p) && typeof object[p] === 'function' && pointcut.test(p)) {
-						remove = addAspectToMethod(target, p, aspect);
-
-					}
-				}
-
+				remove = addAspectToMatches(target, pointcut, aspect);
 			}
 		}
 
@@ -358,8 +327,53 @@ define(function () {
 
 	}
 
-	function findTarget(target) {
-		return target.prototype || target;
+	function addAspectToMethod(target, method, aspect) {
+		var advisor = Advisor.get(target, method);
+
+		return advisor && advisor.add(aspect);
+	}
+
+	function addAspectToAll(target, methodArray, aspect) {
+		var removers, added, f, i;
+
+		removers = [];
+		i = 0;
+
+		while((f = methodArray[i++])) {
+			added = addAspectToMethod(target, f, aspect);
+			added && removers.push(added);
+		}
+
+		return createRemover(removers);
+	}
+
+	function addAspectToMatches(target, pointcut, aspect) {
+		var removers = [];
+		// Assume the pointcut is a an object with a .test() method
+		for (var p in target) {
+			// TODO: Decide whether hasOwnProperty is correct here
+			// Only apply to own properties that are functions, and match the pointcut regexp
+			if (typeof target[p] == 'function' && pointcut.test(p)) {
+				// if(object.hasOwnProperty(p) && typeof object[p] === 'function' && pointcut.test(p)) {
+				removers.push(addAspectToMethod(target, p, aspect));
+			}
+		}
+
+		return createRemover(removers);
+	}
+
+	function createRemover(removers) {
+		return {
+			remove: function() {
+				for (var i = removers.length - 1; i >= 0; --i) {
+					removers[i].remove();
+				}
+			}
+		};
+	}
+
+	function getPointcutTarget(target) {
+		return typeof target == 'function' ? target.prototype||target : target;
 	}
 
 	// Create an API function for the specified advice type
