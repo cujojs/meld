@@ -21,7 +21,7 @@ buster.testCase('remove', {
 		advice = this.spy();
 		ref = aop.before(fixture, 'method', advice);
 
-		assert(!!fixture.method._advisor);
+		assert.defined(fixture.method._advisor);
 
 		fixture.method();
 		assert.calledOnce(advice);
@@ -44,8 +44,8 @@ buster.testCase('remove', {
 		advice = this.spy();
 		ref = aop.before(fixture, /method[12]/, advice);
 
-		assert(!!fixture.method1._advisor);
-		assert(!!fixture.method2._advisor);
+		assert.defined(fixture.method1._advisor);
+		assert.defined(fixture.method2._advisor);
 
 		fixture.method1();
 		fixture.method2();
