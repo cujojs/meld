@@ -18,6 +18,12 @@ Helpful link for updating submodules:
 
 ## Changelog
 
+### v0.5.4
+
+* Optimizations to run time advice invocation
+* Fix for passing new args to joinpoint.proceed() in around advice
+* Ported unit tests to [BusterJS](http://busterjs.org]
+
 ### v0.5.3
 
 * First official release as part of [cujojs](http://github.com/cujojs)
