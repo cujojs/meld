@@ -215,8 +215,6 @@ define(function () {
 				}
 			}
 
-//			aspects.push(aspect);
-
 			return {
 				remove: function () {
 					var adviceType, advices, count;
