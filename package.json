@@ -32,5 +32,8 @@
 	"main": "meld",
 	"directories": {
 		"test": "test"
-	}
+	},
+    "scripts": {
+        "test": "./node_modules/buster/bin/buster-test -e node"
+    }
 }
