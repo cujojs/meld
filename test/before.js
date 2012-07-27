@@ -113,5 +113,5 @@ buster.testCase('before', {
 
 })(
 	require('buster'),
-	require('../aop')
+	require('../meld')
 );

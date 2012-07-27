@@ -70,5 +70,5 @@ buster.testCase('on', {
 
 })(
 	require('buster'),
-	require('../aop')
+	require('../meld')
 );

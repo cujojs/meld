@@ -1,5 +1,5 @@
 {
-	"name": "aop",
+	"name": "meld",
 	"version": "0.5.4",
 	"description": "AOP for JS with before, around, on, afterReturning, afterThrowing, after advice, and pointcut support",
 	"keywords": ["aop"],
@@ -26,7 +26,10 @@
 			"web": "http://hovercraftstudios.com"
 		}
 	],
-	"main": "./aop",
+    "devDependencies": {
+        "buster": "~0.6"
+    },
+	"main": "meld",
 	"directories": {
 		"test": "test"
 	}

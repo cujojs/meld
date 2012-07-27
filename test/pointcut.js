@@ -130,5 +130,5 @@ buster.testCase('pointcuts', {
 
 })(
 	require('buster'),
-	require('../aop')
+	require('../meld')
 );

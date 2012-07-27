@@ -143,5 +143,5 @@ buster.testCase('afterReturning', {
 
 })(
 	require('buster'),
-	require('../aop')
+	require('../meld')
 );

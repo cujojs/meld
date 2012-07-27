@@ -119,5 +119,5 @@ buster.testCase('remove', {
 
 })(
 	require('buster'),
-	require('../aop')
+	require('../meld')
 );

@@ -138,5 +138,5 @@ buster.testCase('afterThrowing', {
 
 })(
 	require('buster'),
-	require('../aop')
+	require('../meld')
 );

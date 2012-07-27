@@ -29,5 +29,5 @@ buster.testCase('prototype', {
 
 })(
 	require('buster'),
-	require('../aop')
+	require('../meld')
 );

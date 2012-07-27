@@ -151,5 +151,5 @@ buster.testCase('around', {
 
 })(
 	require('buster'),
-	require('../aop')
+	require('../meld')
 );
