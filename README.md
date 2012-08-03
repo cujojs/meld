@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/cujojs/meld.png)](http://travis-ci.org/cujojs/meld)
+
 [Aspect Oriented Programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming "Aspect-oriented programming - Wikipedia, the free encyclopedia") for Javascript.
 
 ## Changelog
@@ -5,7 +7,6 @@
 ### v0.6.0
 
 * aop.js is now meld.js
-* Use [buster.js](http://busterjs.org) for all unit tests
 * Use [Travis CI](http://travis-ci.org/cujojs/meld)
 
 ### v0.5.4
