@@ -14,7 +14,7 @@
 * Optimizations to run time advice invocation, especially around advice
 * Fix for passing new args to `joinpoint.proceed()` in around advice
 * Added `joinpoint.proceedApply(array)` for proceeding and supplying new arguments as an array
-* Ported unit tests to [BusterJS](http://busterjs.org]
+* Ported unit tests to [BusterJS](http://busterjs.org)
 
 ### v0.5.3
 
