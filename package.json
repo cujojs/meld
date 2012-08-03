@@ -1,8 +1,8 @@
 {
 	"name": "meld",
-	"version": "0.5.4",
+	"version": "0.6.0",
 	"description": "AOP for JS with before, around, on, afterReturning, afterThrowing, after advice, and pointcut support",
-	"keywords": ["aop"],
+	"keywords": ["aop", "aspect"],
 	"licenses": [
 		{
 			"type": "MIT",
@@ -12,18 +12,18 @@
 	"repositories": [
 		{
 			"type": "git",
-			"url": "https://github.com/cujojs/aop"
+			"url": "https://github.com/cujojs/meld"
 		}
 	],
-	"bugs": "https://github.com/cujojs/aop/issues",
+	"bugs": "https://github.com/cujojs/meld/issues",
 	"maintainers": [
 		{
 			"name": "Brian Cavalier",
 			"web": "http://hovercraftstudios.com"
 		},
 		{
-			"name": "Brian Cavalier",
-			"web": "http://hovercraftstudios.com"
+			"name": "John Hann",
+			"web": "http://unscriptable.com"
 		}
 	],
     "devDependencies": {
