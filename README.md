@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### v0.6.0
+
+* aop.js is now meld.js
+* Use [buster.js](http://busterjs.org) for all unit tests
+* Use [Travis CI](http://travis-ci.org/cujojs/meld)
+
 ### v0.5.4
 
 * Optimizations to run time advice invocation, especially around advice
