@@ -34,6 +34,6 @@
 		"test": "test"
 	},
     "scripts": {
-        "test": "./node_modules/buster/bin/buster-test -e node"
+        "test": "buster test -e node"
     }
 }
