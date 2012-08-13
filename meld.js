@@ -86,10 +86,33 @@ define(function () {
 			return result;
 
 			function callOrig(args) {
-				var result = orig.apply(context, args);
+				var result = context instanceof advised
+					? callConstructor(args)
+					: orig.apply(context, args);
 				advisor._callSimpleAdvice('on', context, args);
 
 				return result;
+			}
+
+			function callConstructor(args) {
+				// shamelessly derived from https://github.com/cujojs/wire/blob/c7c55fe50238ecb4afbb35f902058ab6b32beb8f/lib/component.js#L25
+				if (!Object.create) {
+					throw new Error('An ES5 environment is required for advice on constructors');
+				}
+				var instance = Object.create(orig.prototype);
+
+				try {
+					Object.defineProperty(instance, 'constructor', {
+						value: orig,
+						enumerable: false
+					});
+				} catch(e) {
+					// ignore
+				}
+
+				orig.apply(instance, args);
+
+				return instance;
 			}
 
 			function callAfter(afterType, args) {
