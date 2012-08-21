@@ -181,11 +181,13 @@ define(function () {
 				var proceed, joinpoint;
 
 				/**
-				 * Create proceed function that calls the next around advice, or the original.  Overwrites itself so that it can only be called once.
-				 * @param [args] {Array} optional arguments to use instead of the original arguments
+				 * Create proceed function that calls the next around advice, or
+				 * the original.  May be called multiple times, for example, in retry
+				 * scenarios
+				 * @param [args] {Array} optional arguments to use instead of the
+				 * original arguments
 				 */
 				proceed = function (args) {
-					proceed = proceedAlreadyCalled;
 					return callNext(i - 1, args);
 				};
 
@@ -427,8 +429,6 @@ define(function () {
 			func(array[i]);
 		}
 	}
-
-	function proceedAlreadyCalled() { throw new Error("proceed() may only be called once"); }
 
 });
 })(typeof define == 'function'

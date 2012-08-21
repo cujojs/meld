@@ -56,13 +56,13 @@ buster.testCase('around', {
 		assert.equals(1, ret);
 	},
 
-	'should disallow multiple calls to proceed()': function() {
+	'should allow multiple calls to proceed()': function() {
 		var target = new Fixture();
 
 		aop.around(target, 'method', function aroundAdvice(joinpoint) {
-			// Calling joinpoint.proceed() multiple times should fail
+			// Calling joinpoint.proceed() multiple times is allowed
 			refute.exception(joinpoint.proceed);
-			assert.exception(joinpoint.proceed);
+			refute.exception(joinpoint.proceed);
 		});
 
 		target.method(arg);
