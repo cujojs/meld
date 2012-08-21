@@ -60,7 +60,7 @@ define(function () {
 			var context, args, result, afterType, exception;
 
 			context = this;
-			args = argsToArray(arguments);
+			args = slice.call(arguments);
 			afterType = 'afterReturning';
 
 			advisor._callSimpleAdvice('before', context, args);
@@ -205,7 +205,7 @@ define(function () {
 				return around.call(context, joinpoint);
 
 				function proceedCall() {
-					return proceed(arguments.length > 0 ? argsToArray(arguments) : args);
+					return proceed(arguments.length > 0 ? slice.call(arguments) : args);
 				}
 
 				function proceedApply(newArgs) {
@@ -446,15 +446,6 @@ define(function () {
 				return addAspect(target, method, aspect);
 			}
 		};
-	}
-
-	/**
-	 * Helper to convert arguments to an array
-	 * @param a {Arguments} arguments
-	 * @return {Array}
-	 */
-	function argsToArray(a) {
-		return slice.call(a);
 	}
 
 	function forEach(array, func) {
