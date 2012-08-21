@@ -14,8 +14,7 @@
 (function (define) {
 define(function () {
 
-	var ap, prepend, append, iterators, slice, isArray, defineProperty, freeze, undef;
-
+	var ap, prepend, append, iterators, slice, isArray, defineProperty, freeze;
 	freeze = Object.freeze || function (o) { return o; };
 
 	ap      = Array.prototype;
