@@ -4,6 +4,10 @@
 
 ## Changelog
 
+### v0.7.0
+
+* Advice can be applied to constructors.  This is only supported when constructors are attached to a context
+
 ### v0.6.0
 
 * aop.js is now meld.js

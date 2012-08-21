@@ -6,7 +6,7 @@ var assert, refute;
 assert = buster.assert;
 refute = buster.refute;
 
-var arg = 'foo';
+var arg = {};
 
 // Test fixture
 function Fixture(a) {
@@ -14,7 +14,7 @@ function Fixture(a) {
 }
 
 buster.testCase('constructors', {
-	'should advise a constructor using arround advise': function() {
+	'should advise a constructor using around advise': function() {
 		var target, spy, ret;
 
 		target = { method: Fixture };
@@ -57,6 +57,19 @@ buster.testCase('constructors', {
 		ret = new target.method(arg);
 
 		assert.called(spy);
+		assert(ret instanceof Fixture);
+		assert.same(Fixture, ret.constructor);
+		assert.same(arg, ret.prop);
+	},
+
+	'should advise a constructor without context': function() {
+		var AdvisedFixture, spy, ret;
+
+		spy = this.spy();
+		AdvisedFixture = meld.before(Fixture, spy);
+
+		ret = new AdvisedFixture(arg);
+		assert.calledOnceWith(spy, arg);
 		assert(ret instanceof Fixture);
 		assert.same(Fixture, ret.constructor);
 		assert.same(arg, ret.prop);

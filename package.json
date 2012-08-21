@@ -1,6 +1,6 @@
 {
 	"name": "meld",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"description": "AOP for JS with before, around, on, afterReturning, afterThrowing, after advice, and pointcut support",
 	"keywords": ["aop", "aspect"],
 	"licenses": [

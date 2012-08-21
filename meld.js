@@ -9,12 +9,12 @@
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @version 0.6.0
+ * @version 0.7.0
  */
 (function (define) {
 define(function () {
 
-	var ap, prepend, append, iterators, slice, isArray, defineProperty, freeze;
+	var ap, prepend, append, iterators, slice, isArray, defineProperty, freeze, undef;
 
 	freeze = Object.freeze || function (o) { return o; };
 
@@ -325,28 +325,54 @@ define(function () {
 
 		var pointcutType, remove;
 
-		target = getPointcutTarget(target);
-
-		if (isArray(pointcut)) {
-			remove = addAspectToAll(target, pointcut, aspect);
-
+		if(arguments.length < 3) {
+			return addAspectToFunction(target, pointcut);
 		} else {
-			pointcutType = typeof pointcut;
+			target = getPointcutTarget(target);
 
-			if (pointcutType === 'string') {
-				if (typeof target[pointcut] === 'function') {
-					remove = addAspectToMethod(target, pointcut, aspect);
-				}
-
-			} else if (pointcutType === 'function') {
-				remove = addAspectToAll(target, pointcut(target), aspect);
+			if (isArray(pointcut)) {
+				remove = addAspectToAll(target, pointcut, aspect);
 
 			} else {
-				remove = addAspectToMatches(target, pointcut, aspect);
+				pointcutType = typeof pointcut;
+
+				if (pointcutType === 'string') {
+					if (typeof target[pointcut] === 'function') {
+						remove = addAspectToMethod(target, pointcut, aspect);
+					}
+
+				} else if (pointcutType === 'function') {
+					remove = addAspectToAll(target, pointcut(target), aspect);
+
+				} else {
+					remove = addAspectToMatches(target, pointcut, aspect);
+				}
 			}
+
+			return remove;
 		}
 
-		return remove;
+	}
+
+	/**
+	 * Add an aspect to a pure function, returning an advised version of it.
+	 * NOTE: *only the returned function* is advised.  The original (input) function
+	 * is not modified in any way.
+	 * @param func {Function} function to advise
+	 * @param aspect {Object} aspect to add
+	 * @return {Function} advised function
+	 */
+	function addAspectToFunction(func, aspect) {
+		var name, placeholderTarget;
+
+		name = func.name || '_';
+
+		placeholderTarget = {};
+		placeholderTarget[name] = func;
+
+		addAspectToMethod(placeholderTarget, name, aspect);
+
+		return placeholderTarget[name];
 
 	}
 
@@ -401,12 +427,17 @@ define(function () {
 
 	// Create an API function for the specified advice type
 	function adviceApi(type) {
-		return function(target, func, adviceFunc) {
+		return function(target, method, adviceFunc) {
 			var aspect = {};
-			aspect[type] = adviceFunc;
 
-			return addAspect(target, func, aspect);
-		};
+			if(arguments.length === 2) {
+				aspect[type] = method;
+				return addAspect(target, aspect);
+			} else {
+				aspect[type] = adviceFunc;
+				return addAspect(target, method, aspect);
+			}
+		}
 	}
 
 	/**
