@@ -121,6 +121,31 @@ buster.testCase('around', {
 		assert.calledOnceWith(spy, 1, 2, 3);
 	},
 
+	'should be able to modify arguments using array': function() {
+		var target, spy;
+
+		target = new Fixture();
+		spy = target.method = this.spy();
+
+		// Starting value
+		assert.equals(0, target.val);
+
+		aop.around(target, 'method', function aroundAdvice(joinpoint) {
+			// arg should be the return value from the orig method
+			assert.equals(1, joinpoint.args.length);
+			assert.equals(arg, joinpoint.args[0]);
+
+			// Modify the original args and pass them through to
+			// the original func
+			return joinpoint.proceedApply([1, 2, 3]);
+		});
+
+		target.method(arg);
+
+		// Make sure the return value is preserved, also based on the modified args
+		assert.calledOnceWith(spy, 1, 2, 3);
+	},
+
 	'should be able to modify the return value': function() {
 		var target = new Fixture();
 		target.method = this.stub().returns(0);
