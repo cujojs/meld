@@ -138,7 +138,9 @@ define(function () {
 			var iterator, advices;
 
 			advices = this.aspects[adviceType];
-			if(!advices) return;
+			if(!advices) {
+				return;
+			}
 
 			iterator = iterators[adviceType];
 
@@ -231,7 +233,10 @@ define(function () {
 
 				if(advice) {
 					advices = aspects[adviceType];
-					if(!advices) aspects[adviceType] = advices = [];
+					if(!advices) {
+						aspects[adviceType] = advices = [];
+					}
+
 					advices.push({
 						aspect: aspect,
 						advice: advice
@@ -282,13 +287,17 @@ define(function () {
 	// Returns the advisor for the target object-function pair.  A new advisor
 	// will be created if one does not already exist.
 	Advisor.get = function(target, func) {
-		if(!(func in target)) return;
+		if(!(func in target)) {
+			return;
+		}
 
 		var advisor, advised;
 
 		advised = target[func];
 
-		if(typeof advised !== 'function') throw new Error('Advice can only be applied to functions: ' + func);
+		if(typeof advised !== 'function') {
+			throw new Error('Advice can only be applied to functions: ' + func);
+		}
 
 		advisor = advised._advisor;
 		if(!advisor) {
@@ -436,7 +445,7 @@ define(function () {
 				aspect[type] = adviceFunc;
 				return addAspect(target, method, aspect);
 			}
-		}
+		};
 	}
 
 	/**
