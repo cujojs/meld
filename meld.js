@@ -465,7 +465,7 @@ define(function () {
 	? define
 	: function (factory) { typeof module != 'undefined'
 		? (module.exports = factory())
-		: (this.aop = factory());
+		: (this.meld = factory());
 	}
 	// Boilerplate for AMD, Node, and browser global
 );
