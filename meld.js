@@ -86,7 +86,7 @@ define(function () {
 
 			function callOrig(args) {
 				var result = context instanceof advised
-					? callConstructor(orig, args)
+					? applyConstructor(orig, args)
 					: orig.apply(context, args);
 				advisor._callSimpleAdvice('on', context, args);
 
@@ -427,7 +427,7 @@ define(function () {
 		};
 	}
 
-	function callConstructor(C, args) {
+	function applyConstructor(C, args) {
 		// shamelessly derived from https://github.com/cujojs/wire/blob/c7c55fe50238ecb4afbb35f902058ab6b32beb8f/lib/component.js#L25
 		if (!Object.create) {
 			throw new Error('An ES5 environment is required for advice on constructors');
