@@ -158,7 +158,7 @@ define(function () {
 			}
 
 			function callAround(around, i, args) {
-				var proceed, joinpoint;
+				var proceed, count, proceedCount, joinpoint;
 
 				/**
 				 * Create proceed function that calls the next around advice, or
@@ -168,8 +168,18 @@ define(function () {
 				 * original arguments
 				 */
 				proceed = function (args) {
+					count++;
 					return callNext(i - 1, args);
 				};
+
+				/**
+				 * The number of times proceed() has been called
+				 */
+				proceedCount = function () {
+					return count;
+				};
+
+				count = 0;
 
 				// Joinpoint is immutable
 				joinpoint = freeze({
@@ -177,7 +187,8 @@ define(function () {
 					method: method,
 					args: args,
 					proceed: proceedCall,
-					proceedApply: proceedApply
+					proceedApply: proceedApply,
+					proceedCount: proceedCount
 				});
 
 				// Call supplied around advice function
