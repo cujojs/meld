@@ -6,7 +6,9 @@
 
 ### v0.7.0
 
-* Advice can be applied to constructors.  This is only supported when constructors are attached to a context
+* Advice can be applied directly to functions without a context.
+* Advice can be applied to constructors.
+* `joinpoint.proceed()` can be called multiple times. This makes it possible to implement "retry" types of advice.
 
 ### v0.6.0
 
