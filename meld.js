@@ -9,7 +9,7 @@
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @version 0.7.0
+ * @version 0.7.1
  */
 (function (define) {
 define(function () {
