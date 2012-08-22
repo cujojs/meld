@@ -12,7 +12,6 @@
 	* [After Throwing](#after-throwing)
 	* [After (Finally)](#after-finally)
 	* [Around](#around)
-        * Joinpoint
 1. [Removing Advice](#removing-advice)
 
 # Adding Advice
