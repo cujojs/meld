@@ -6,8 +6,8 @@
 
 ### 0.7.1
 
-* Fix for global name when using meld as a browser global.
-* Update unit tests to run in browser using `buster server`, in addition to node. Thanks [https://github.com/scothis](scothis).
+* Fix for global name when using meld as a browser global. Thanks [@scothis](https://github.com/scothis)
+* Update unit tests to run in browser using `buster server`, in addition to node. Thanks again, [@scothis](https://github.com/scothis) :)
 
 ### v0.7.0
 
