@@ -26,14 +26,14 @@
 			"web": "http://unscriptable.com"
 		}
 	],
-    "devDependencies": {
-        "buster": "~0.6"
-    },
+	"devDependencies": {
+		"buster": "~0.6"
+	},
 	"main": "meld",
 	"directories": {
 		"test": "test"
 	},
-    "scripts": {
-        "test": "buster test -e node"
-    }
+	"scripts": {
+		"test": "buster test -e node"
+	}
 }
