@@ -82,6 +82,6 @@ buster.testCase('after', {
 });
 
 })(
-	require('buster'),
-	require('../meld')
+	this.buster || require('buster'),
+	this.meld || require('../meld')
 );
