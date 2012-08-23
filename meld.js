@@ -158,28 +158,9 @@ define(function () {
 			}
 
 			function callAround(around, i, args) {
-				var proceed, count, proceedCount, joinpoint;
+				var proceedCalled, joinpoint;
 
-				/**
-				 * Create proceed function that calls the next around advice, or
-				 * the original.  May be called multiple times, for example, in retry
-				 * scenarios
-				 * @param [args] {Array} optional arguments to use instead of the
-				 * original arguments
-				 */
-				proceed = function (args) {
-					count++;
-					return callNext(i - 1, args);
-				};
-
-				/**
-				 * The number of times proceed() has been called
-				 */
-				proceedCount = function () {
-					return count;
-				};
-
-				count = 0;
+				proceedCalled = 0;
 
 				// Joinpoint is immutable
 				joinpoint = freeze({
@@ -194,13 +175,47 @@ define(function () {
 				// Call supplied around advice function
 				return around.call(context, joinpoint);
 
-				function proceedCall() {
+				/**
+				 * The number of times proceed() has been called
+				 * @return {Number}
+				 */
+				function proceedCount() {
+					return proceedCalled;
+				}
+
+				/**
+				 * Proceed to the original method/function or the next around
+				 * advice using original arguments or new argument list if
+				 * arguments.length > 0
+				 * @return {*} result of original method/function or next around advice
+				 */
+				function proceedCall(/* newArg1, newArg2... */) {
 					return proceed(arguments.length > 0 ? slice.call(arguments) : args);
 				}
 
+				/**
+				 * Proceed to the original method/function or the next around
+				 * advice using original arguments or new argument list if
+				 * newArgs is supplied
+				 * @param [newArgs] {Array} new arguments with which to proceed
+				 * @return {*} result of original method/function or next around advice
+				 */
 				function proceedApply(newArgs) {
 					return proceed(newArgs || args);
 				}
+
+				/**
+				 * Create proceed function that calls the next around advice, or
+				 * the original.  May be called multiple times, for example, in retry
+				 * scenarios
+				 * @param [args] {Array} optional arguments to use instead of the
+				 * original arguments
+				 */
+				function proceed(args) {
+					proceedCalled++;
+					return callNext(i - 1, args);
+				}
+
 			}
 
 			return callNext(len - 1, args);
@@ -213,50 +228,19 @@ define(function () {
 		 */
 		add: function(aspect) {
 
-			var aspects, advisor, adviceType, advice, advices;
+			var advisor, aspects;
 
 			advisor = this;
 			aspects = advisor.aspects;
 
-			for(adviceType in iterators) {
-				advice = aspect[adviceType];
-
-				if(advice) {
-					advices = aspects[adviceType];
-					if(!advices) {
-						aspects[adviceType] = advices = [];
-					}
-
-					advices.push({
-						aspect: aspect,
-						advice: advice
-					});
-				}
-			}
+			insertAspect(aspects, aspect);
 
 			return {
 				remove: function () {
-					var adviceType, advices, count;
-
-					count = 0;
-
-					for(adviceType in iterators) {
-						advices = aspects[adviceType];
-						if(advices) {
-							count += advices.length;
-
-							for (var i = advices.length - 1; i >= 0; --i) {
-								if (advices[i].aspect === aspect) {
-									advices.splice(i, 1);
-									--count;
-									break;
-								}
-							}
-						}
-					}
+					var remaining = removeAspect(aspects, aspect);
 
 					// If there are no aspects left, restore the original method
-					if (!count) {
+					if (!remaining) {
 						advisor.remove();
 					}
 				}
@@ -274,25 +258,30 @@ define(function () {
 		}
 	};
 
-	// Returns the advisor for the target object-function pair.  A new advisor
-	// will be created if one does not already exist.
-	Advisor.get = function(target, func) {
-		if(!(func in target)) {
+	/**
+	 * Returns the advisor for the target object-function pair.  A new advisor
+	 * will be created if one does not already exist.
+	 * @param target {*} target containing a method with tthe supplied methodName
+	 * @param methodName {String} name of method on target for which to get an advisor
+	 * @return {Object} existing or newly created advisor for the supplied method
+	 */
+	Advisor.get = function(target, methodName) {
+		if(!(methodName in target)) {
 			return;
 		}
 
 		var advisor, advised;
 
-		advised = target[func];
+		advised = target[methodName];
 
 		if(typeof advised !== 'function') {
-			throw new Error('Advice can only be applied to functions: ' + func);
+			throw new Error('Advice can only be applied to functions: ' + methodName);
 		}
 
 		advisor = advised._advisor;
 		if(!advisor) {
-			advisor = new Advisor(target, func);
-			target[func] = advisor.advised;
+			advisor = new Advisor(target, methodName);
+			target[methodName] = advisor.advised;
 		}
 
 		return advisor;
@@ -438,6 +427,61 @@ define(function () {
 		};
 	}
 
+	/**
+	 * Insert the supplied aspect into aspectList
+	 * @param aspectList {Object} list of aspects, categorized by advice type
+	 * @param aspect {Object} aspect containing one or more supported advice types
+	 */
+	function insertAspect(aspectList, aspect) {
+		var adviceType, advice, advices;
+
+		for(adviceType in iterators) {
+			advice = aspect[adviceType];
+
+			if(advice) {
+				advices = aspectList[adviceType];
+				if(!advices) {
+					aspectList[adviceType] = advices = [];
+				}
+
+				advices.push({
+					aspect: aspect,
+					advice: advice
+				});
+			}
+		}
+	}
+
+	/**
+	 * Remove the supplied aspect from aspectList
+	 * @param aspectList {Object} list of aspects, categorized by advice type
+	 * @param aspect {Object} aspect containing one or more supported advice types
+	 * @return {Number} Number of *advices* left on the advised function.  If
+	 *  this returns zero, then it is safe to remove the advisor completely.
+	 */
+	function removeAspect(aspectList, aspect) {
+		var adviceType, advices, remaining;
+
+		remaining = 0;
+
+		for(adviceType in iterators) {
+			advices = aspectList[adviceType];
+			if(advices) {
+				remaining += advices.length;
+
+				for (var i = advices.length - 1; i >= 0; --i) {
+					if (advices[i].aspect === aspect) {
+						advices.splice(i, 1);
+						--remaining;
+						break;
+					}
+				}
+			}
+		}
+
+		return remaining;
+	}
+
 	function applyConstructor(C, args) {
 		// shamelessly derived from https://github.com/cujojs/wire/blob/c7c55fe50238ecb4afbb35f902058ab6b32beb8f/lib/component.js#L25
 		if (!Object.create) {
@@ -460,7 +504,7 @@ define(function () {
 	}
 
 	function forEach(array, func) {
-		for (var i = 0, len = array.length; i < len; ++i) {
+		for (var i = 0, len = array.length; i < len; i++) {
 			func(array[i]);
 		}
 	}
