@@ -61,8 +61,11 @@ buster.testCase('around', {
 
 		aop.around(target, 'method', function aroundAdvice(joinpoint) {
 			// Calling joinpoint.proceed() multiple times is allowed
+			assert.same(0, joinpoint.proceedCount());
 			refute.exception(joinpoint.proceed);
+			assert.same(1, joinpoint.proceedCount());
 			refute.exception(joinpoint.proceed);
+			assert.same(2, joinpoint.proceedCount());
 		});
 
 		target.method(arg);
