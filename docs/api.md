@@ -1,22 +1,128 @@
 # API - meld.js
 
-1. [Adding Advice](#adding-advice)
-	* [Methods](#methods)
-	* [Functions](#functions)
-	* [Constructors](#constructors)
-	* Multiple advices, aka "Stacking"
-1. [Advice types](#advice-types)
+1. Advice
+1. Advice Types
 	* [Before](#before)
 	* [On](#on)
 	* [After Returning](#after-returning)
 	* [After Throwing](#after-throwing)
 	* [After (Finally)](#after-finally)
 	* [Around](#around)
-1. [Removing Advice](#removing-advice)
+		* [Joinpoint](#joinpoint)
+1. Advice Order
+1. Advising Methods
+	* Matching method names
+1. Removing Method Advice
+1. Advising Functions
+1. Advising Constructors
 
-# Adding Advice
+# Advice
 
-## Methods
+Advice is additional functionality that can be added to a method or function *noninvasively* rather than being coded directly into the original.  This has the advantage of allowing the original to be simpler and to be concerned only with its primary purpose.  It also allows the advice to be applied to many methods or functions, to be easily enabled or disabled, as well as to be maintained and tested separately.
+
+Some common examples of advice are:
+
+1. Logging function parameters and return values for debugging.
+1. Collecting statistics about execution time
+1. Caching/memoization
+1. Transaction demarcation
+
+## Simple Caching Example
+
+Here is a simple example of using meld.js to add caching to an existing method.
+
+```js
+// A simple object with a method whose results we'd like to
+// cache/memoize
+var myObject = {
+	doSomething: function(a, b) {
+		if(arguments.length < 2) {
+			throw new Error('doSomething must be called with 2 arguments');
+		}
+
+		// This is a trivial computation, not really worth
+		// caching, but could easily be something more complex.
+		return a + b;
+	}
+};
+
+var cache = {};
+meld.around(myObject, 'doSomething', function(methodCall) {
+	var cacheKey, result;
+
+	// Create a simple cache key from the arguments passed
+	// to the original method call.
+	cacheKey = methodCall.args.join();
+
+	if(cacheKey in cache) {
+		// If the cacheKey was found, return the cached result
+		result = cache[cacheKey];
+	} else {
+		// If not, allow the original method to be executed,
+		// with it's original arguments, and compute the result.
+		result = methodCall.proceed();
+		cache[cacheKey] = result;
+	}
+
+	return result;
+});
+
+var result;
+
+// No results cached yet, so this will compute the result
+// and cache it.
+result = myObject.doSomething(1, 2);
+
+// The previous call caused the result of 1 + 2 to be cached,
+// so this call will simply return the cached result.
+result = myObject.doSomething(1, 2);
+```
+
+# Advice Types
+
+## Before
+
+*Before* executes before another function, and receives the same parameters.
+
+## On
+
+*On* advice executes, conceptually, at the same time as another function, and receives the same parameters.
+
+## AfterReturning
+
+*AfterReturning* advice executes after another function returns, and receives the return value as its parameter.
+
+## AfterThrowing
+
+*AfterThrowing* advice executes after another function throws, and receives the thrown exception as its parameter.
+
+## After (finally)
+
+*After* advice executes after another function returns *or* throws, and receives either the return value or the thrown exception as its parameter.
+
+## Around
+
+*Around*, as its name implies, executes around another function.  It is the most powerful type of advice.  It may execute code before and after the original function, modify the arguments passed to the original, or even elect to prevent the original function from executing at all (see the [Simple Caching Example](#simple-caching-example] above).
+
+Around advice receives a [Joinpoint](#joinpoint) as its only parameter, which it can use to access the original arguments, context, and method name of the original function, as well as allow the original function to continue, with either its original arguments, or a modified list of arguments.
+
+### Joinpoint
+
+A joinpoint is the point at which a method or function was intercepted.  Think of it as a description of the original function invocation.
+
+# Advice Order
+
+When multiple advices are added to the same method or function, they run in the following order. Note that *before* advice runs in LIFO order, while all other advice types run in FIFO order.
+
+1. *Before* advice in LIFO order
+1. *Around* advice in FIFO order
+	1. All code up to calling `joinpoint.proceed()`
+	1. *On* advice in FIFO order
+	1. All code after calling `joinpoint.process()`
+1. *AfterReturning* or *AfterThrowing* advice in FIFO order
+1. *After* (finally) advice in FIFO order
+
+# Advising Methods
 
 Adding advice to a method:
 
@@ -142,10 +248,6 @@ t = new OriginalThing('Bob');
 console.log(t.name); // Logs 'Bob'
 ```
 
-## Multiple advices
-
-Meld allows you to add multiple advice functions.
-
 # Advice types
 
 ## Before
@@ -162,16 +264,3 @@ var advisedFunction = meld.before(functionToAdvise, beforeFunction);
 
 Returns a new function that calls `beforeFunction` before executing the original behavior of `functionToAdvise`, leaving the original `functionToAdvise` untouched.
 
-## On
-
-## AfterReturning
-
-## AfterThrowing
-
-## After (Finally)
-
-## Around
-
-### Joinpoint
-
-# Removing Advice
