@@ -240,7 +240,9 @@ console.log(t.name); // Logs 'Bob'
 // This returns an advised constructor, so it's important
 // to use the return value.
 Thing = meld.after(Thing, function() {
-	// Note that `this` is the constructed object
+	// Note that `this` is the constructed object, and
+	// is an instanceof Thing, just as if this code
+	// were inside the original Thing constructor
 	this.name += 'by';
 });
 
