@@ -1,5 +1,8 @@
 # API - meld.js
 
+1. Advising Methods
+2. Advising Functions
+
 1. [Adding Advice](#adding-advice)
 	* [Methods](#methods)
 	* [Functions](#functions)
@@ -29,11 +32,11 @@ meld.before(myObject, 'doSomething', function() {
 myObject.doSomething(1, 2, 3); // Logs: "3"
 ```
 
-### Matching method names
+## Matching method names
 
 You can also pass an Array, a RegExp, or even a function as the second parameter, and meld will apply the advice to all methods that match.
 
-#### Array match
+### Array match
 
 ```js
 // Use an Array to call a function before particular methods of myObject
@@ -46,7 +49,7 @@ myObject.doSomethingElse(1, 2); // Logs: "2"
 myObject.someOtherMethod(1, 2); // Doesn't log anything
 ```
 
-#### RegExp match
+### RegExp match
 
 ```js
 // Use a RegExp to call a function before methods of myObject
@@ -60,7 +63,7 @@ myObject.doSomethingElse(1, 2); // Logs: "2"
 myObject.someOtherMethod(1, 2); // Doesn't log anything
 ```
 
-#### Function match
+### Function match
 
 ```js
 // Use a Function matcher to call a function before
@@ -97,7 +100,7 @@ var doSomething = originalDoSomething;
 
 doSomething(1, 2); // Doesn't log anything
 
-// Add before advice directly to the original function
+// Add before advice directly to the original function.
 // This returns an advised function, so it's important
 // to use the return value.
 doSomething = meld.before(doSomething, function() {
@@ -113,9 +116,34 @@ originalDoSomething(1, 2); // Doesn't log anything
 
 ## Constructors
 
-Advice can be added to constructor functions that are invoked with `new`:
+Advice can be added to constructor functions that are invoked with `new`.  Similarly to [advising functions](#functions), advising a constructor returns a *new constructor* function, and the original constructor is left untouched.
 
-*TODO: Example*
+```js
+function OriginalThing(name) {
+	this.name = name;
+}
+
+var Thing = OriginalThing;
+
+var t = new Thing('Bob');
+console.log(t.name); // Logs 'Bob'
+
+// Add after advice directly to the Thing constructor.
+// This returns an advised constructor, so it's important
+// to use the return value.
+Thing = meld.after(Thing, function() {
+	// Note that `this` is the constructed object
+	this.name += 'by';
+});
+
+// New constructor has advice applied
+t = new Thing('Bob');
+console.log(t.name); // Logs 'Bobby'
+
+// Original constructor has not been modified
+t = new OriginalThing('Bob');
+console.log(t.name); // Logs 'Bob'
+```
 
 ## Multiple advices
 
