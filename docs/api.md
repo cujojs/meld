@@ -102,7 +102,7 @@ result = myObject.doSomething(1, 2);
 
 ## Around
 
-*Around*, as its name implies, executes around another function.  It is the most powerful type of advice.  It may execute code before and after the original function, modify the arguments passed to the original, or even elect to prevent the original function from executing at all (see the [Simple Caching Example](#simple-caching-example] above).
+*Around* is the most powerful type of advice and, as its name implies, executes *around* another function.  It may execute code before and after the original function, modify the arguments passed to the original, or even elect to prevent the original function from executing at all (see the [Simple Caching Example](#simple-caching-example] above).
 
 Around advice receives a [Joinpoint](#joinpoint) as its only parameter, which it can use to access the original arguments, context, and method name of the original function, as well as allow the original function to continue, with either its original arguments, or a modified list of arguments.
 
