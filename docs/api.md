@@ -1,8 +1,5 @@
 # API - meld.js
 
-1. Advising Methods
-2. Advising Functions
-
 1. [Adding Advice](#adding-advice)
 	* [Methods](#methods)
 	* [Functions](#functions)

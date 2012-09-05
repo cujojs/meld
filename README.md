@@ -91,7 +91,7 @@ Run unit tests in Browsers (and Node):
 
 ### 0.6.0
 
-* meld.js is now meld.js
+* aop.js is now meld.js
 * Use [Travis CI](http://travis-ci.org/cujojs/meld)
 
 ### 0.5.4
