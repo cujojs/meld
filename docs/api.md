@@ -12,9 +12,9 @@
 1. [Advice Order](#advice-order)
 1. [Advising Methods](#advising-methods)
 	* [Matching method names](#matching-method-names)
-1. Removing Method Advice
-1. Advising Functions
-1. Advising Constructors
+1. [Removing Method Advice](#removing-method-advice)
+1. [Advising Functions](#advising-functions)
+1. [Advising Constructors](#advising-constructors)
 
 # Advice
 
@@ -190,16 +190,20 @@ myObject.doSomethingElse(1, 2); // Doesn't log anything
 myObject.someOtherMethod(1, 2); // Doesn't log anything
 ```
 
-## Functions
+# Removing Method Advice
+
+TODO
+
+# Advising Functions
 
 Advice can be added directly to functions that don't have a context.  In this case, an *advised function* is returned, and the original function is left untouched.
 
 ```js
-function originalDoSomething(a, b) {
+var doSomething = function(a, b) {
 	return a + b;
 }
 
-var doSomething = originalDoSomething;
+var originalDoSomething = doSomething;
 
 doSomething(1, 2); // Doesn't log anything
 
@@ -217,16 +221,17 @@ doSomething(1, 2); // Logs: "2"
 originalDoSomething(1, 2); // Doesn't log anything
 ```
 
-## Constructors
+# Advising Constructors
 
-Advice can be added to constructor functions that are invoked with `new`.  Similarly to [advising functions](#functions), advising a constructor returns a *new constructor* function, and the original constructor is left untouched.
+Advice can be added to constructor functions that are invoked with `new`.  Similarly to [advising functions](#advising-functions), advising a constructor returns an *advised constructor* function, and the original constructor is left untouched.
 
 ```js
-function OriginalThing(name) {
+var Thing = function(name) {
 	this.name = name;
 }
 
-var Thing = OriginalThing;
+// Save the original constructor
+var OriginalThing = Thing;
 
 var t = new Thing('Bob');
 console.log(t.name); // Logs 'Bob'
@@ -248,9 +253,11 @@ t = new OriginalThing('Bob');
 console.log(t.name); // Logs 'Bob'
 ```
 
-# Advice types
+----
 
-## Before
+# TODO
+
+1. Write API sections about each advice type, similar to this:
 
 ```js
 var remover = meld.before(object, match, beforeFunction);
