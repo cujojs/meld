@@ -1,7 +1,7 @@
 # API - meld.js
 
-1. Advice
-1. Advice Types
+1. [Advice](#advice)
+1. [Advice Types](#advice-types)
 	* [Before](#before)
 	* [On](#on)
 	* [After Returning](#after-returning)
@@ -9,9 +9,9 @@
 	* [After (Finally)](#after-finally)
 	* [Around](#around)
 		* [Joinpoint](#joinpoint)
-1. Advice Order
-1. Advising Methods
-	* Matching method names
+1. [Advice Order](#advice-order)
+1. [Advising Methods](#advising-methods)
+	* [Matching method names](#matching-method-names)
 1. Removing Method Advice
 1. Advising Functions
 1. Advising Constructors
