@@ -57,16 +57,39 @@ define(function () {
 		advisor = this;
 
 		advised = this.advised = function() {
-			var context, args, result, afterType, exception;
+			var context, args, callOrig, result, afterType, exception;
 
 			context = this;
+
+			// If called as a constructor (i.e. using "new"), create a context
+			// of the correct type, so that all advice types (including before!)
+			// are called with the correct context.
+			// NOTE: Requires ES5 Object.create()
+			if(context instanceof advised) {
+				// shamelessly derived from https://github.com/cujojs/wire/blob/c7c55fe50238ecb4afbb35f902058ab6b32beb8f/lib/component.js#L25
+				if (!Object.create) {
+					throw new Error('An ES5 environment is required for advice on constructors');
+				}
+
+				context = Object.create(orig.prototype);
+				callOrig = function (args) {
+					return applyConstructor(orig, context, args);
+				}
+
+			} else {
+				callOrig = function(args) {
+					return orig.apply(context, args);
+				}
+
+			}
+
 			args = slice.call(arguments);
 			afterType = 'afterReturning';
 
 			advisor._callSimpleAdvice('before', context, args);
 
 			try {
-				result = advisor._callAroundAdvice(context, func, args, callOrig);
+				result = advisor._callAroundAdvice(context, func, args, callOrigAndOn);
 			} catch(e) {
 				result = exception = e;
 				// Switch to afterThrowing
@@ -84,10 +107,8 @@ define(function () {
 
 			return result;
 
-			function callOrig(args) {
-				var result = context instanceof advised
-					? applyConstructor(orig, args)
-					: orig.apply(context, args);
+			function callOrigAndOn(args) {
+				var result = callOrig(args);
 				advisor._callSimpleAdvice('on', context, args);
 
 				return result;
@@ -482,13 +503,7 @@ define(function () {
 		return remaining;
 	}
 
-	function applyConstructor(C, args) {
-		// shamelessly derived from https://github.com/cujojs/wire/blob/c7c55fe50238ecb4afbb35f902058ab6b32beb8f/lib/component.js#L25
-		if (!Object.create) {
-			throw new Error('An ES5 environment is required for advice on constructors');
-		}
-		var instance = Object.create(C.prototype);
-
+	function applyConstructor(C, instance, args) {
 		try {
 			Object.defineProperty(instance, 'constructor', {
 				value: C,

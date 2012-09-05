@@ -78,6 +78,10 @@ Run unit tests in Browsers (and Node):
 
 # Changelog
 
+### 0.7.2
+
+* Fix for context when advising constructors: `this` is now the constructed instance in all advice functions.
+
 ### 0.7.1
 
 * Fix for global name when using meld as a browser global. Thanks [@scothis](https://github.com/scothis)
