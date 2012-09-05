@@ -20,7 +20,51 @@ Fixture.prototype = {
 	prototypeProperty: true
 };
 
+function FixtureThrows(a) {
+	throw new Error(a);
+}
+
 buster.testCase('constructors', {
+	'should provide correct context to advice types': function() {
+		var Advised, count;
+
+		Advised = Fixture;
+		count = 0;
+
+		Advised = meld.before(Advised, verifyContext);
+		Advised = meld.on(Advised, verifyContext);
+		Advised = meld.around(Advised, verifyContextAround);
+		Advised = meld.afterReturning(Advised, verifyContext);
+		Advised = meld.after(Advised, verifyContext);
+
+		new Advised();
+		assert.equals(count, 5);
+
+		function verifyContext() {
+			count++;
+			assert(this instanceof Fixture);
+		}
+
+		function verifyContextAround(jp) {
+			verifyContext.call(this);
+			return jp.proceed();
+		}
+	},
+
+	'should provide correct context to afterThrowing': function() {
+		var Advised;
+
+		Advised = meld.afterThrowing(FixtureThrows, verifyContext);
+
+		assert.exception(function() {
+			new Advised();
+		});
+
+		function verifyContext() {
+			assert(this instanceof FixtureThrows);
+		}
+	},
+
 	'should advise a constructor using around advise': function() {
 		var target, spy, ret;
 
