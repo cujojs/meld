@@ -102,7 +102,7 @@ result = myObject.doSomething(1, 2);
 
 ## Around
 
-*Around* is the most powerful type of advice and, as its name implies, executes *around* another function.  It may execute code before and after the original function, modify the arguments passed to the original, or even elect to prevent the original function from executing at all (see the [Simple Caching Example](#simple-caching-example] above).
+*Around* is the most powerful type of advice and, as its name implies, executes *around* another function.  It may execute code before and after the original function, modify the arguments passed to the original, or even elect to prevent the original function from executing at all (see the [Simple Caching Example](#simple-caching-example) above).
 
 Around advice receives a [Joinpoint](#joinpoint) as its only parameter, which it can use to access the original arguments, context, and method name of the original function, as well as allow the original function to continue, with either its original arguments, or a modified list of arguments.
 
@@ -121,6 +121,94 @@ When multiple advices are added to the same method or function, they run in the 
 	1. All code after calling `joinpoint.proceed()` in FIFO order
 1. *AfterReturning* or *AfterThrowing* advice in FIFO order
 1. *After* (finally) advice in FIFO order
+
+## Advice Order Example
+
+```js
+var myObject = {
+	doSomething: function(x) {
+		console.log(x);
+	}
+};
+
+// Before advice executes in LIFO order
+meld.before(myObject, 'doSomething', function(x) {
+	console.log(2);
+});
+
+meld.before(myObject, 'doSomething', function(x) {
+	console.log(1);
+});
+
+// Around advice wraps the intercepted method in layers
+// The first around is immediately around the intercepted method
+meld.around(myObject, 'doSomething', function(joinpoint) {
+	// code before joinpoint.proceed() executes LIFO
+	console.log(4);
+	var result = joinpoint.proceed();
+
+	// code after joinpoint.proceed() executes FIFO
+	console.log(8);
+
+	return result;
+});
+
+// The second around advice is layered around the first!
+meld.around(myObject, 'doSomething', function(joinpoint) {
+	// code before joinpoint.proceed() executes LIFO
+	console.log(3);
+	var result = joinpoint.proceed();
+
+	// code after joinpoint.proceed() executes FIFO
+	console.log(9);
+
+	return result;
+});
+
+// On advice executes in LIFO order within around advice
+meld.on(myObject, 'doSomething', function(x) {
+	console.log(6);
+});
+
+meld.on(myObject, 'doSomething', function(x) {
+	console.log(7);
+});
+
+// After Returning advice executes in FIFO order
+meld.afterReturning(myObject, 'doSomething', function(x) {
+	console.log(10);
+});
+
+meld.afterReturning(myObject, 'doSomething', function(x) {
+	console.log(11);
+});
+
+// After advice executes in FIFO order
+meld.after(myObject, 'doSomething', function(x) {
+	console.log(12);
+});
+
+meld.after(myObject, 'doSomething', function(x) {
+	console.log(13);
+});
+
+myObject.doSomething(5);
+
+// Logs:
+// 1
+// 2
+// 3
+// 4
+// 5
+// 6
+// 7
+// 8
+// 9
+// 10
+// 11
+// 12
+// 13
+```
 
 # Advising Methods
 
