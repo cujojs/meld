@@ -86,7 +86,7 @@ result = myObject.doSomething(1, 2);
 
 ## On
 
-*On* advice executes, conceptually, at the same time as another function, and receives the same parameters.
+*On* advice executes, conceptually, at the same time as another function, and receives the same parameters.  In practice, on advice will execute *immediately after* the advised function, before around advice code that comes after `joinpoint.proceed`.  See [Around advice](#around) and [Advice Order](#advice-order) for more information on the exact ordering of around and on advice.
 
 ## AfterReturning
 
@@ -108,7 +108,7 @@ Around advice receives a [Joinpoint](#joinpoint) as its only parameter, which it
 
 ### Joinpoint
 
-A joinpoint is the point at which a method or function was intercepted.  Think of it as a description of the original function invocation.
+A joinpoint is the point at which a method or function was intercepted.  Think of it as a description of the original function invocation.  It provides the arguments with which the original method was called, the method name (in the case of an object method), and its own methods for allowing the original method call to continue and getting its result.
 
 # Advice Order
 
@@ -118,7 +118,7 @@ When multiple advices are added to the same method or function, they run in the 
 1. *Around* advice:
 	1. All code up to calling `joinpoint.proceed()` in LIFO order
 	1. *On* advice in FIFO order
-	1. All code after calling `joinpoint.process()` in FIFO order
+	1. All code after calling `joinpoint.proceed()` in FIFO order
 1. *AfterReturning* or *AfterThrowing* advice in FIFO order
 1. *After* (finally) advice in FIFO order
 
@@ -127,22 +127,58 @@ When multiple advices are added to the same method or function, they run in the 
 Adding advice to a method:
 
 ```js
-// Call a function before myObject.doSomething
+var myObject = {
+	doSomething: function(a, b) {
+		if(arguments.length < 2) {
+			throw new Error('doSomething must be called with 2 arguments');
+		}
+
+		// This is a trivial computation, not really worth
+		// caching, but could easily be something more complex.
+		return a + b;
+	}
+};
+
+// Arrange for a function to be called before myObject.doSomething
 meld.before(myObject, 'doSomething', function() {
 	console.log(arguments.length);
 });
 
-myObject.doSomething(1, 2, 3); // Logs: "3"
+// Logs:
+// 2
+myObject.doSomething(1, 2);
+
+// Multiple advices may be added
+meld.after(myObject, 'doSomething', function(result) {
+	console.log(result);
+});
+
+// Logs:
+// 2
+// 3
+myObject.doSomething(1, 2);
+
+// Logs:
+// 1
+// Error: doSomething must be called with 2 arguments
+myObject.doSomething(1);
 ```
 
 ## Matching method names
 
-You can also pass an Array, a RegExp, or even a function as the second parameter, and meld will apply the advice to all methods that match.
+In addition to passing a String to specify what method to advise, you can also pass an Array, a RegExp, a Function as the second parameter, and meld will apply the supplied advice to each method that matches.
+
+### String match
+
+The simplest type of method name matching that matches only a method with the exact name specified in the String.  See the [example above](#advising-methods).
 
 ### Array match
 
+Passing an Array of Strings will match each method name in the Array.
+
 ```js
-// Use an Array to call a function before particular methods of myObject
+// Use an Array to call a function before particular methods
+// of myObject
 meld.before(myObject, ['doSomething', 'doSomethingElse'], function() {
 	console.log(arguments.length);
 });
@@ -153,6 +189,8 @@ myObject.someOtherMethod(1, 2); // Doesn't log anything
 ```
 
 ### RegExp match
+
+Passing a RegExp will match each method name that matches the RegExp.
 
 ```js
 // Use a RegExp to call a function before methods of myObject
@@ -237,6 +275,8 @@ originalDoSomething(1, 2); // Doesn't log anything
 ```
 
 # Advising Constructors
+
+**IMPORTANT:** As ES5 compliant `Object.create()` must be available to advise constructors.  If you're running in an environment that does not provide `Object.create()`, consider using a shim, such as [cujo.js's poly](https://github.com/cujojs/poly), or [es5-shim](https://github.com/kriskowal/es5-shim)
 
 Advice can be added to constructor functions that are invoked with `new`.  Similarly to [advising functions](#advising-functions), advising a constructor returns an *advised constructor* function, and the original constructor is left untouched.
 

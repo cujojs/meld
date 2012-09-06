@@ -1,15 +1,16 @@
 # meld.js API
 
-1. Adding Advice
-	* meld.before
-	* meld.around
-	* meld.on
-	* meld.afterReturning
-	* meld.afterThrowing
-	* meld.after
-1. Adding Multiple Advices
-	* meld.add
-1. Removing Method Advice
+1. [Adding Advice](#adding-advice)
+	* [meld.before](#meldbefore)
+	* [meld.around](#meldaround)
+	* [meld.on](#meldon)
+	* [meld.afterReturning](#meldafterreturning)
+	* [meld.afterThrowing](#meldafterthrowing)
+	* [meld.after](#meldafter)
+1. [Adding Multiple Advices](#adding-multiple-advices)
+	* [meld.add](#meldadd)
+1. [Removing Method Advice](#removing-method-advice)
+1. [Constructor-specific Info](#constructor-specific-info)
 
 # Adding Advice
 
@@ -19,7 +20,9 @@
 var remover = meld.before(object, match, beforeFunction);
 ```
 
-Adds before advice to matching methods.  The `beforeFunction` will be called before the matching method.
+Adds before advice to matching methods.  The `beforeFunction` will be called before, and will receive the same arguments as the matching method.
+
+**NOTE:** `beforeFunction` should have the same signature as the method, function, or constructor being advised.
 
 ```js
 var advisedFunction = meld.before(functionToAdvise, beforeFunction);
@@ -28,8 +31,6 @@ var AdvisedConstructor = meld.before(ConstructorToAdvise, beforeFunction);
 ```
 
 Returns a new function or constructor that calls `beforeFunction` before executing the original behavior of `functionToAdvise`/`ConstructorToAdvice`, leaving the original untouched.
-
-**NOTE:** `beforeFunction` should have the same signature as the method, function, or constructor being advised.
 
 ## meld.around
 
@@ -50,4 +51,174 @@ var AdvisedConstructor = meld.around(ConstructorToAdvise, aroundFunction);
 ```
 
 Returns a new function or constructor that calls `beforeFunction` before executing the original behavior of `functionToAdvise`/`ConstructorToAdvice`, leaving the original untouched.
+
+### joinpoint
+
+The joinpoint passed to around advice has the following properties:
+
+```js
+joinpoint = {
+	// Context (i.e. this) of the original method call
+	target: <any type>,
+	
+	// Array of arguments passed to the original method call
+	args: Array,
+	
+	// Name of the original method
+	method: String,
+
+	// When, called, causes the original method to be invoked
+	// When called without arguments, the original arguments will
+	// be passed.
+	// When called with arguments, they will be passed
+	// *instead of* the original arguments
+	proceed: Function,
+
+	// Similar to proceed, but accepts an Array of new
+	// arguments, (like Function.apply)
+	proceedApply: Function,
+
+	// Returns the number of times proceed and/or proceedApply
+	// have been called
+	proceedCount: Function
+}
+```
+
+## meld.on
+
+```js
+var remover = meld.on(object, match, onFunction);
+```
+
+Adds on advice to matching methods.  The `onFunction` will be called immediately after, and will receive the same arguments as the matching method.
+
+**NOTE:** `onFunction` should have the same signature as the method, function, or constructor being advised.
+
+```js
+var advisedFunction = meld.on(functionToAdvise, onFunction);
+
+var AdvisedConstructor = meld.on(ConstructorToAdvise, onFunction);
+```
+
+Returns a new function or constructor that calls `beforeFunction` immediately after executing the original behavior of `functionToAdvise`/`ConstructorToAdvice`, leaving the original untouched.
+
+## meld.afterReturning
+
+```js
+function afterReturningFunction(returnValue) {
+	// ...
+}
+
+var remover = meld.afterReturning(object, match, afterReturningFunction);
+```
+
+Adds afterReturning advice to matching methods.  The `afterReturningFunction` will be called after the matching method returns successfully (i.e. does not throw), and will receive the return value as its only argument.
+
+**NOTE:** afterReturning advice *will not* be executed when the matching method throws.
+
+```js
+var advisedFunction = meld.afterReturning(functionToAdvise, afterReturningFunction);
+
+var AdvisedConstructor = meld.afterReturning(ConstructorToAdvise, afterReturningFunction);
+```
+
+Returns a new function or constructor that calls `afterReturningFunction` after the original `functionToAdvise`/`ConstructorToAdvice` returns successfully, leaving the original untouched.
+
+In the specific case of a constructor, the newly constructed instance acts as the return value, and will be the argument provided to the `afterFunction`.
+
+## meld.afterThrowing
+
+```js
+function afterThrowingFunction(thrownException) {
+	// ...
+}
+
+var remover = meld.afterThrowing(object, match, afterThrowingFunction);
+```
+
+Adds afterThrowing advice to matching methods.  The `afterThrowingFunction` will be called after the matching method throws an exception, and will receive the thrown exception as its only argument.
+
+**NOTE:** afterThrowing advice *will not* be executed when the matching method returns without throwing.
+
+```js
+var advisedFunction = meld.afterThrowing(functionToAdvise, afterThrowingFunction);
+
+var AdvisedConstructor = meld.afterThrowing(ConstructorToAdvise, afterThrowingFunction);
+```
+
+Returns a new function or constructor that calls `afterThrowingFunction` after the original `functionToAdvise`/`ConstructorToAdvice` throws an exception, leaving the original untouched.
+
+
+## meld.after
+
+```js
+function afterFunction(returnValueOrThrownException) {
+	// ...
+}
+
+var remover = meld.after(object, match, afterFunction);
+```
+
+Adds after advice to matching methods.  The `afterFunction` will be called after the matching method returns successfully *or* throws an exception, and will receive either the return value or the thrown exception as its only argument.
+
+**NOTE:** after advice will *always* be executed.
+
+```js
+var advisedFunction = meld.after(functionToAdvise, afterFunction);
+
+var AdvisedConstructor = meld.after(ConstructorToAdvise, afterFunction);
+```
+
+Returns a new function or constructor that calls `afterFunction` after the original `functionToAdvise`/`ConstructorToAdvice` returns successfully or throws an exception, leaving the original untouched.
+
+In the specific case of a constructor, the newly constructed instance acts as the return value, and will be the argument provided to the `afterFunction` when the constructor returns successfully.
+
+# Adding Multiple Advices
+
+Meld.js allows you to add any number of advices to a method, function, or constructor.  In addition to adding them individually, as [shown here](api.md#advising-methods), using the individual advice methods (e.g. meld.before, meld.after, etc.), you can also add several advices at once using `meld.add()`.
+
+## meld.add
+
+```js
+// Supply any or all of the advice types at once
+var advices = {
+	before: function() {
+		console.log("Called with: " + Array.prototype.join.call(arguments));
+	},
+	afterReturning: function(returnValue) {
+		console.log("Returned: " + returnValue);
+	},
+	afterThrowing: function(thrownException) {
+		console.error("Exception: " + thrownException);
+	}
+}
+
+var remover = meld.add(object, match, advices);
+```
+
+Adds multiple advices to each matched method.
+
+```js
+var advisedFunction = meld.add(functionToAdvise, advices);
+
+var AdvisedConstructor = meld.add(ConstructorToAdvise, advices);
+```
+
+Adds multiple advices to the supplied function or constructor.
+
+# Removing Method Advice
+
+See the [Removing Method Advice](reference.md#removing-method-advice) section of the Reference doc.
+
+# Constructor-specific Info
+
+**IMPORTANT:** As ES5 compliant `Object.create()` must be available to advise constructors.  If you're running in an environment that does not provide `Object.create()`, consider using a shim, such as [cujo.js's poly](https://github.com/cujojs/poly), or [es5-shim](https://github.com/kriskowal/es5-shim)
+
+Advising constructors has a few particulars that are worth noting, or different from advising non-constructor functions and methods.  Specifically:
+
+1. In most cases, the return value of a constructor is the newly constructed instance, and thus it will be the argument provided to afterReturning advice, and to after advice when the constructor returns successfully (i.e. doesn't throw).
+1. Constructors are [allowed to return something other than their constructed instance](http://ecma-international.org/ecma-262/5.1/#sec-13.2.2) as long as it is an Object.  When advising constructors, meld.js preserves that behavior.  Around advice, which can modify the return value of a constructor is subject to the same restriction: when returning something other than the constructed instance, it must be an Object.
+
+
+
 
