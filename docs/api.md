@@ -212,7 +212,7 @@ See the [Removing Method Advice](reference.md#removing-method-advice) section of
 
 # Constructor-specific Info
 
-**IMPORTANT:** As ES5 compliant `Object.create()` must be available to advise constructors.  If you're running in an environment that does not provide `Object.create()`, consider using a shim, such as [cujo.js's poly](https://github.com/cujojs/poly), or [es5-shim](https://github.com/kriskowal/es5-shim)
+**IMPORTANT:** An ES5-compliant `Object.create()` must be available to advise constructors.  If you're running in an environment that does not provide `Object.create()`, and need to advise constructors, you must use a shim, such as [cujo.js's poly](https://github.com/cujojs/poly), or [es5-shim](https://github.com/kriskowal/es5-shim)
 
 Advising constructors has a few particulars that are worth noting, or different from advising non-constructor functions and methods.  Specifically:
 
