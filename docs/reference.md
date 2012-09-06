@@ -115,10 +115,10 @@ A joinpoint is the point at which a method or function was intercepted.  Think o
 When multiple advices are added to the same method or function, they run in the following order. Note that *before* advice runs in LIFO order, while all other advice types run in FIFO order.
 
 1. *Before* advice in LIFO order
-1. *Around* advice in FIFO order
-	1. All code up to calling `joinpoint.proceed()`
+1. *Around* advice:
+	1. All code up to calling `joinpoint.proceed()` in LIFO order
 	1. *On* advice in FIFO order
-	1. All code after calling `joinpoint.process()`
+	1. All code after calling `joinpoint.process()` in FIFO order
 1. *AfterReturning* or *AfterThrowing* advice in FIFO order
 1. *After* (finally) advice in FIFO order
 
