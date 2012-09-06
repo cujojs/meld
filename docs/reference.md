@@ -192,7 +192,22 @@ myObject.someOtherMethod(1, 2); // Doesn't log anything
 
 # Removing Method Advice
 
-TODO
+When adding advice to object methods, meld returns an object with a `remove()` method that can be used to remove the advice that was just added.
+
+```js
+// Call a function before myObject.doSomething
+var remover = meld.before(myObject, 'doSomething', function() {
+	console.log(arguments.length);
+});
+
+myObject.doSomething(1, 2, 3); // Logs: "3"
+
+remover.remove();
+
+myObject.doSomething(1, 2, 3); // Nothing logged
+```
+
+When adding advice to functions and constructors, meld leaves the original function or constructor unmodified, and returns a *new function or constructor*.  Thus, there is no need to "remove" advice.  Simply discard the new function or constructor and use the original.
 
 # Advising Functions
 
