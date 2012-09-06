@@ -1,15 +1,15 @@
 /** @license MIT License (c) copyright B Cavalier & J Hann */
 
 /**
- * aop
+ * meld
  * Aspect Oriented Programming for Javascript
  *
- * aop is part of the cujo.js family of libraries (http://cujojs.com/)
+ * meld is part of the cujo.js family of libraries (http://cujojs.com/)
  *
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @version 0.7.1
+ * @version 0.7.2
  */
 (function (define) {
 define(function () {
@@ -59,13 +59,11 @@ define(function () {
 		advised = this.advised = function() {
 			var context, args, callOrig, result, afterType, exception;
 
-			context = this;
-
 			// If called as a constructor (i.e. using "new"), create a context
 			// of the correct type, so that all advice types (including before!)
 			// are called with the correct context.
 			// NOTE: Requires ES5 Object.create()
-			if(context instanceof advised) {
+			if(this instanceof advised) {
 				// shamelessly derived from https://github.com/cujojs/wire/blob/c7c55fe50238ecb4afbb35f902058ab6b32beb8f/lib/component.js#L25
 				if (!Object.create) {
 					throw new Error('An ES5 environment is required for advice on constructors');
@@ -74,12 +72,13 @@ define(function () {
 				context = Object.create(orig.prototype);
 				callOrig = function (args) {
 					return applyConstructor(orig, context, args);
-				}
+				};
 
 			} else {
+				context = this;
 				callOrig = function(args) {
 					return orig.apply(context, args);
-				}
+				};
 
 			}
 
