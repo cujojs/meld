@@ -1,15 +1,15 @@
 /** @license MIT License (c) copyright B Cavalier & J Hann */
 
 /**
- * aop
+ * meld
  * Aspect Oriented Programming for Javascript
  *
- * aop is part of the cujo.js family of libraries (http://cujojs.com/)
+ * meld is part of the cujo.js family of libraries (http://cujojs.com/)
  *
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @version 0.7.1
+ * @version 0.7.2
  */
 (function (define) {
 define(function () {
