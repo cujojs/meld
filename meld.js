@@ -530,11 +530,11 @@ define(function () {
 	}
 
 });
-})(typeof define == 'function'
+})(typeof define == 'function' && define.amd
 	? define
-	: function (factory) { typeof module != 'undefined'
+	: function (factory) { typeof exports == 'object'
 		? (module.exports = factory())
 		: (this.meld = factory());
 	}
-	// Boilerplate for AMD, Node, and browser global
+	// Boilerplate for AMD, CommonJS, and browser global
 );
