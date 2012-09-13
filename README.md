@@ -25,7 +25,8 @@ myObject.doSomething(1, 2); // Nothing logged
 
 # Docs
 
-[API docs](blob/master/docs/api.md)
+* [API](blob/master/docs/api.md)
+* [Reference](blob/master/docs/reference.md)
 
 # Quick Start
 
@@ -77,6 +78,11 @@ Run unit tests in Browsers (and Node):
 3. `buster test` or `buster test -e browser`
 
 # Changelog
+
+### 0.8.0
+
+* 1.0.0 Release Candidate 1
+* Documentation! Check out the new [reference](blob/master/docs/reference.md) and [api](blob/master/docs/api.md) docs.
 
 ### 0.7.2
 

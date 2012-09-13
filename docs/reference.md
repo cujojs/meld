@@ -165,7 +165,7 @@ meld.around(myObject, 'doSomething', function(joinpoint) {
 	return result;
 });
 
-// On advice executes in LIFO order within around advice
+// On advice executes in FIFO order inside around advice
 meld.on(myObject, 'doSomething', function(x) {
 	console.log(6);
 });
@@ -193,21 +193,24 @@ meld.after(myObject, 'doSomething', function(x) {
 });
 
 myObject.doSomething(5);
+```
 
-// Logs:
-// 1
-// 2
-// 3
-// 4
-// 5
-// 6
-// 7
-// 8
-// 9
-// 10
-// 11
-// 12
-// 13
+Output:
+
+```js
+1  // before
+2  // before
+3  // around, before joinpoint.proceed
+4  // around, before joinpoint.proceed
+5  // **original myObject.doSomething**
+6  // on
+7  // on
+8  // around, after joinpoint.proceed
+9  // around, after joinpoint.proceed
+10 // afterReturning
+11 // afterReturning
+12 // after
+13 // after
 ```
 
 # Advising Methods
