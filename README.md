@@ -25,8 +25,8 @@ myObject.doSomething(1, 2); // Nothing logged
 
 # Docs
 
-* [API](blob/master/docs/api.md)
-* [Reference](blob/master/docs/reference.md)
+* [API](./blob/master/docs/api.md)
+* [Reference](./blob/master/docs/reference.md)
 
 # Quick Start
 
