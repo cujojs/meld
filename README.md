@@ -32,7 +32,12 @@ myObject.doSomething(1, 2); // Nothing logged
 
 ### AMD
 
-1. `git clone https://github.com/cujojs/meld` or `git submodule add https://github.com/cujojs/meld`
+1. Get it using one of the following
+	1. `yeoman install meld`, or
+	1. `bower install meld`, or
+	1. `git clone https://github.com/cujojs/meld`, or
+	1. `git submodule add https://github.com/cujojs/meld`
+
 1. Configure your loader with a package:
 
 	```javascript
