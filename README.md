@@ -88,7 +88,7 @@ Run unit tests in Browsers (and Node):
 ### 0.8.0
 
 * 1.0.0 Release Candidate 1
-* Documentation! Check out the new [reference](blob/master/docs/reference.md) and [api](blob/master/docs/api.md) docs.
+* Documentation! Check out the new [reference](meld/blob/master/docs/reference.md) and [api](meld/blob/master/docs/api.md) docs.
 * **Deprecated browser global** - meld.js will drop support for browser global for 1.0.0 and will support modular environments only.
 
 ### 0.7.2
