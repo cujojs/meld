@@ -257,7 +257,7 @@ myObject.doSomething(1);
 
 ## Matching method names
 
-In addition to passing a String to specify what method to advise, you can also pass an Array, a RegExp, a Function as the second parameter, and meld will apply the supplied advice to each method that matches.
+In addition to passing a String to specify what method to advise, you can also pass an Array, a RegExp, or a Function as the second parameter, and meld will apply the supplied advice to each method that matches.
 
 ### String match
 
@@ -336,7 +336,7 @@ remover.remove();
 myObject.doSomething(1, 2, 3); // Nothing logged
 ```
 
-When adding advice to functions and constructors, meld leaves the original function or constructor unmodified, and returns a *new function or constructor*.  Thus, there is no need to "remove" advice.  Simply discard the new function or constructor and use the original.
+**NOTE:** When adding advice to functions and constructors, meld leaves the original function or constructor unmodified, and returns a *new function or constructor*.  Thus, there is no need to "remove" advice.  Simply discard the new function or constructor and use the original.
 
 # Advising Functions
 
