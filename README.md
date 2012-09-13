@@ -44,12 +44,6 @@ myObject.doSomething(1, 2); // Nothing logged
 
 1. `define(['meld', ...], function(meld, ...) { ... });` or `require(['meld', ...], function(meld, ...) { ... });`
 
-### Script Tag
-
-1. `git clone https://github.com/cujojs/meld` or `git submodule add https://github.com/cujojs/meld`
-1. `<script src="path/to/meld/meld.js"></script>`
-1. `meld` will be available as `window.meld`
-
 ### Node
 
 1. `npm install meld`
@@ -59,6 +53,13 @@ myObject.doSomething(1, 2); // Nothing logged
 
 1. `ringo-admin install cujojs/meld`
 1. `var meld = require('meld');`
+
+### DEPRECATED: Script Tag Browser Global
+
+1. `git clone https://github.com/cujojs/meld` or `git submodule add https://github.com/cujojs/meld`
+1. `<script src="path/to/meld/meld.js"></script>`
+1. `meld` will be available as `window.meld`
+
 
 Running the Unit Tests
 ======================
@@ -83,6 +84,7 @@ Run unit tests in Browsers (and Node):
 
 * 1.0.0 Release Candidate 1
 * Documentation! Check out the new [reference](blob/master/docs/reference.md) and [api](blob/master/docs/api.md) docs.
+* **Deprecated browser global** - meld.js will drop support for browser global for 1.0.0, and support modular environments only.
 
 ### 0.7.2
 

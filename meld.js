@@ -534,7 +534,7 @@ define(function () {
 	? define
 	: function (factory) { typeof exports == 'object'
 		? (module.exports = factory())
-		: (this.meld = factory());
+		: (this.meld = factory()); // DEPRECATED: browser global
 	}
-	// Boilerplate for AMD, CommonJS, and browser global
+	// Boilerplate for AMD, CommonJS, and (DEPRECATED) browser global
 );
