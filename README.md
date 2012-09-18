@@ -85,6 +85,8 @@ Run unit tests in Browsers (and Node):
 
 # Changelog
 
+### 1.0.0
+
 ### 0.8.0
 
 * 1.0.0 Release Candidate 1

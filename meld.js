@@ -9,12 +9,13 @@
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @version 0.8.0
+ * @version 1.0.0
  */
 (function (define) {
 define(function () {
 
 	var ap, prepend, append, iterators, slice, isArray, defineProperty, freeze;
+	
 	freeze = Object.freeze || function (o) { return o; };
 
 	ap      = Array.prototype;
@@ -532,9 +533,6 @@ define(function () {
 });
 })(typeof define == 'function' && define.amd
 	? define
-	: function (factory) { typeof exports == 'object'
-		? (module.exports = factory())
-		: (this.meld = factory()); // DEPRECATED: browser global
-	}
-	// Boilerplate for AMD, CommonJS, and (DEPRECATED) browser global
+	: function (factory) { module.exports = factory(); }
+	// Boilerplate for AMD and CommonJS
 );
