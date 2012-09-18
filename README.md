@@ -40,7 +40,7 @@ myObject.doSomething(1, 2); // Nothing logged
 
 1. Configure your loader with a package:
 
-	```javascript
+	```js
 	packages: [
 		{ name: 'meld', location: 'path/to/meld', main: 'meld' },
 		// ... other packages ...
@@ -59,13 +59,6 @@ myObject.doSomething(1, 2); // Nothing logged
 1. `ringo-admin install cujojs/meld`
 1. `var meld = require('meld');`
 
-### DEPRECATED: Script Tag Browser Global
-
-1. `git clone https://github.com/cujojs/meld` or `git submodule add https://github.com/cujojs/meld`
-1. `<script src="path/to/meld/meld.js"></script>`
-1. `meld` will be available as `window.meld`
-
-
 Running the Unit Tests
 ======================
 
@@ -75,13 +68,7 @@ Install [buster.js](http://busterjs.org/)
 
 Run unit tests in Node:
 
-1. `buster test -e node`
-
-Run unit tests in Browsers (and Node):
-
-1. `buster server` - this will print a url
-2. Point browsers at <buster server url>/capture, e.g. `localhost:1111/capture`
-3. `buster test` or `buster test -e browser`
+`buster test`
 
 # Changelog
 
