@@ -87,6 +87,9 @@ Run unit tests in Browsers (and Node):
 
 ### 1.0.0
 
+* **Removed browser global** - `window.meld` is no longer supported. See [this post on the cujo.js Google Group](https://groups.google.com/d/topic/cujojs/K0VGuvpYQ34/discussion) for an explanation.
+* No functional change beyond browser global removal.
+
 ### 0.8.0
 
 * 1.0.0 Release Candidate 1
