@@ -124,13 +124,13 @@ define(function () {
 
 	Advisor.prototype = {
 
-		   /**
-			* Invoke all advice functions in the supplied context, with the supplied args
-			*
-			* @param adviceType
-			* @param context
-			* @param args
-			*/
+		/**
+		 * Invoke all advice functions in the supplied context, with the supplied args
+		 *
+		 * @param adviceType
+		 * @param context
+		 * @param args
+		 */
 		_callSimpleAdvice: function(adviceType, context, args) {
 
 			// before advice runs LIFO, from most-recently added to least-recently added.
