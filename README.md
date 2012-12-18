@@ -72,6 +72,11 @@ Run unit tests in Node:
 
 # Changelog
 
+### 1.1.0
+
+* **Removed implicit constructor prototype advice** - to advise a constructor prototype, pass the prototype as the target instead of the constuctor.
+* Advice can be applied directly to methods on a function
+
 ### 1.0.0
 
 * **Removed browser global** - `window.meld` is no longer supported. See [this post on the cujo.js Google Group](https://groups.google.com/d/topic/cujojs/K0VGuvpYQ34/discussion) for an explanation.
