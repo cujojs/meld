@@ -14,8 +14,27 @@
 (function (define) {
 define(function () {
 
-	var ap, prepend, append, iterators, slice, isArray, defineProperty, freeze;
-	
+	var meld, ap, prepend, append, iterators, slice, isArray, defineProperty, freeze;
+
+	//
+	// Public API
+	//
+
+	meld = {
+		// General add aspect
+		// Returns a function that will remove the newly-added aspect
+		add:            addAspect,
+
+		// Add a single, specific type of advice
+		// returns a function that will remove the newly-added advice
+		before:         adviceApi('before'),
+		around:         adviceApi('around'),
+		on:             adviceApi('on'),
+		afterReturning: adviceApi('afterReturning'),
+		afterThrowing:  adviceApi('afterThrowing'),
+		after:          adviceApi('after')
+	};
+
 	freeze = Object.freeze || function (o) { return o; };
 
 	ap      = Array.prototype;
@@ -308,25 +327,6 @@ define(function () {
 		return advisor;
 	};
 
-	//
-	// Public API
-	//
-
-	return {
-		// General add aspect
-		// Returns a function that will remove the newly-added aspect
-		add:            addAspect,
-
-		// Add a single, specific type of advice
-		// returns a function that will remove the newly-added advice
-		before:         adviceApi('before'),
-		around:         adviceApi('around'),
-		on:             adviceApi('on'),
-		afterReturning: adviceApi('afterReturning'),
-		afterThrowing:  adviceApi('afterThrowing'),
-		after:          adviceApi('after')
-	};
-
 	function addAspect(target, pointcut, aspect) {
 		// pointcut can be: string, Array of strings, RegExp, Function(targetObject): Array of strings
 		// advice can be: object, Function(targetObject, targetMethodName)
@@ -499,7 +499,8 @@ define(function () {
 
 	function applyConstructor(C, instance, args) {
 		try {
-			Object.defineProperty(instance, 'constructor', {
+			// Try to define a constructor, but don't care if it fails
+			defineProperty(instance, 'constructor', {
 				value: C,
 				enumerable: false
 			});
@@ -523,6 +524,8 @@ define(function () {
 			func(array[i]);
 		}
 	}
+
+	return meld;
 
 });
 })(typeof define == 'function' && define.amd
