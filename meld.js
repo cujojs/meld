@@ -9,7 +9,7 @@
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @version 1.0.0
+ * @version 1.1.0
  */
 (function (define) {
 define(function () {
@@ -336,8 +336,6 @@ define(function () {
 		if(arguments.length < 3) {
 			return addAspectToFunction(target, pointcut);
 		} else {
-			target = getPointcutTarget(target);
-
 			if (isArray(pointcut)) {
 				remove = addAspectToAll(target, pointcut, aspect);
 
@@ -427,10 +425,6 @@ define(function () {
 				}
 			}
 		};
-	}
-
-	function getPointcutTarget(target) {
-		return typeof target == 'function' ? target.prototype||target : target;
 	}
 
 	// Create an API function for the specified advice type

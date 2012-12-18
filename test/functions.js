@@ -47,6 +47,22 @@ buster.testCase('functions', {
 		assert.calledOnceWith(spyBefore, 1);
 		assert.calledOnceWith(spyAround, 2);
 		assert.calledOnceWith(spyAfter, 3);
+	},
+
+	'should advise a method on a function': function() {
+		var before, method, target;
+
+		function target() {}
+		method = target.method = this.spy();
+		before = this.spy();
+
+		// Advise the function method
+		meld.before(target, 'method', before);
+
+		target.method();
+
+		assert.calledOnce(before);
+		assert.calledOnce(method);
 	}
 
 
