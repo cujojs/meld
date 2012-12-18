@@ -75,7 +75,7 @@ Run unit tests in Node:
 ### 1.1.0
 
 * Advice can be applied directly to methods on a function.
-* Removed undocumented feature that implicitly adds constructor prototype advice: to advise a prototype, pass the prototype as the advice target.
+* Removed undocumented behavior that implicitly adds constructor prototype advice: to advise a prototype, pass the prototype as the advice target.
 
 ### 1.0.0
 
