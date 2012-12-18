@@ -16,7 +16,7 @@ buster.testCase('prototype', {
 		before = this.spy();
 
 		// Advise the prototype method
-		aop.before(Fixture, 'method', before);
+		aop.before(Fixture.prototype, 'method', before);
 
 		target = new Fixture();
 		target.method();
