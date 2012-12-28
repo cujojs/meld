@@ -14,7 +14,8 @@
 (function (define) {
 define(function () {
 
-	var meld, ap, prepend, append, iterators, slice, isArray, defineProperty, freeze;
+	var meld, currentJoinpoint, joinpointStack,
+		ap, prepend, append, iterators, slice, isArray, defineProperty;
 
 	//
 	// Public API
@@ -32,10 +33,16 @@ define(function () {
 		on:             adviceApi('on'),
 		afterReturning: adviceApi('afterReturning'),
 		afterThrowing:  adviceApi('afterThrowing'),
-		after:          adviceApi('after')
+		after:          adviceApi('after'),
+
+		// Access to the current joinpoint in advices
+		joinpoint:      joinpoint
 	};
 
-	freeze = Object.freeze || function (o) { return o; };
+	// TOOD: Freeze joinpoints when v8 perf problems are resolved
+//	freeze = Object.freeze || function (o) { return o; };
+
+	joinpointStack = [];
 
 	ap      = Array.prototype;
 	prepend = ap.unshift;
@@ -77,7 +84,7 @@ define(function () {
 		advisor = this;
 
 		advised = this.advised = function() {
-			var context, args, callOrig, result, afterType, exception;
+			var context, joinpoint, args, callOrig, afterType;
 
 			// If called as a constructor (i.e. using "new"), create a context
 			// of the correct type, so that all advice types (including before!)
@@ -105,26 +112,39 @@ define(function () {
 			args = slice.call(arguments);
 			afterType = 'afterReturning';
 
-			advisor._callSimpleAdvice('before', context, args);
+			// Save the previous joinpoint and set the current joinpoint
+			joinpoint = pushJoinpoint({
+				target: context,
+				method: func,
+				args: args
+			});
 
 			try {
-				result = advisor._callAroundAdvice(context, func, args, callOrigAndOn);
-			} catch(e) {
-				result = exception = e;
-				// Switch to afterThrowing
-				afterType = 'afterThrowing';
+				advisor._callSimpleAdvice('before', context, args);
+
+				try {
+					joinpoint.result = advisor._callAroundAdvice(context, func, args, callOrigAndOn);
+				} catch(e) {
+					joinpoint.result = joinpoint.exception = e;
+					// Switch to afterThrowing
+					afterType = 'afterThrowing';
+				}
+
+				args = [joinpoint.result];
+
+				callAfter(afterType, args);
+				callAfter('after', args);
+
+				if(joinpoint.exception) {
+					throw joinpoint.exception;
+				}
+
+				return joinpoint.result;
+
+			} finally {
+				// Restore the previous joinpoint, if necessary.
+				popJoinpoint();
 			}
-
-			args = [result];
-
-			callAfter(afterType, args);
-			callAfter('after', args);
-
-			if(exception) {
-				throw exception;
-			}
-
-			return result;
 
 			function callOrigAndOn(args) {
 				var result = callOrig(args);
@@ -203,7 +223,8 @@ define(function () {
 				proceedCalled = 0;
 
 				// Joinpoint is immutable
-				joinpoint = freeze({
+				// TODO: Use Object.freeze once v8 perf problem is fixed
+				joinpoint = pushJoinpoint({
 					target: context,
 					method: method,
 					args: args,
@@ -212,8 +233,12 @@ define(function () {
 					proceedCount: proceedCount
 				});
 
-				// Call supplied around advice function
-				return around.call(context, joinpoint);
+				try {
+					// Call supplied around advice function
+					return around.call(context, joinpoint);
+				} finally {
+					popJoinpoint();
+				}
 
 				/**
 				 * The number of times proceed() has been called
@@ -523,6 +548,19 @@ define(function () {
 		for (var i = array.length - 1; i >= 0; --i) {
 			func(array[i]);
 		}
+	}
+
+	function joinpoint() {
+		return currentJoinpoint;
+	}
+
+	function pushJoinpoint(newJoinpoint) {
+		joinpointStack.push(currentJoinpoint);
+		return currentJoinpoint = newJoinpoint;
+	}
+
+	function popJoinpoint() {
+		return currentJoinpoint = joinpointStack.pop();
 	}
 
 	return meld;
