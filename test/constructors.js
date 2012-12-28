@@ -1,5 +1,5 @@
 (function(buster, meld) {
-"use strict";
+'use strict';
 
 var assert, refute, arg;
 

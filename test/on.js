@@ -1,5 +1,5 @@
-(function(buster, aop) {
-"use strict";
+(function(buster, meld) {
+'use strict';
 
 var assert, refute;
 
@@ -29,7 +29,7 @@ buster.testCase('on', {
 		// Starting value
 		assert.equals(0, target.val);
 
-		aop.on(target, 'method', function on(a) {
+		meld.on(target, 'method', function on(a) {
 			// this should be the advised object
 			assert.equals(target, this);
 
@@ -57,7 +57,7 @@ buster.testCase('on', {
 		target.method = this.stub().throws(new Error());
 		spy = this.spy();
 
-		aop.on(target, 'method', spy);
+		meld.on(target, 'method', spy);
 
 		assert.exception(function() {
 			target.method(arg);

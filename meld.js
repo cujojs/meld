@@ -328,7 +328,7 @@ define(function () {
 	 * will be created if one does not already exist.
 	 * @param target {*} target containing a method with tthe supplied methodName
 	 * @param methodName {String} name of method on target for which to get an advisor
-	 * @return {Object} existing or newly created advisor for the supplied method
+	 * @return {Object|undefined} existing or newly created advisor for the supplied method
 	 */
 	Advisor.get = function(target, methodName) {
 		if(!(methodName in target)) {

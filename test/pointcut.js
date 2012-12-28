@@ -1,5 +1,5 @@
-(function(buster, aop) {
-"use strict";
+(function(buster, meld) {
+'use strict';
 
 var assert, refute;
 
@@ -18,7 +18,7 @@ buster.testCase('pointcuts', {
 
 		before = this.spy();
 
-		aop.add(target, 'method1', {
+		meld.add(target, 'method1', {
 			before: before
 		});
 
@@ -43,7 +43,7 @@ buster.testCase('pointcuts', {
 
 		before = this.spy();
 
-		aop.add(target, ['method1', 'method3'], {
+		meld.add(target, ['method1', 'method3'], {
 			before: before
 		});
 
@@ -73,7 +73,7 @@ buster.testCase('pointcuts', {
 
 		before = this.spy();
 
-		aop.add(target, /method[13]/, {
+		meld.add(target, /method[13]/, {
 			before: before
 		});
 
@@ -103,7 +103,7 @@ buster.testCase('pointcuts', {
 
 		before = this.spy();
 
-		aop.add(target,
+		meld.add(target,
 			function(target) {
 				return ['method1', 'method3'];
 			},

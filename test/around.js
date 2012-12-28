@@ -1,5 +1,5 @@
-(function(buster, aop) {
-"use strict";
+(function(buster, meld) {
+'use strict';
 
 var assert, refute;
 
@@ -14,7 +14,7 @@ function Fixture() {
 }
 
 Fixture.prototype = {
-	method: function(a) {
+	method: function() {
 		return (++this.val);
 	}
 };
@@ -26,7 +26,7 @@ buster.testCase('around', {
 		// Starting value
 		assert.equals(0, target.val);
 
-		aop.around(target, 'method', function aroundAdvice(joinpoint) {
+		meld.around(target, 'method', function aroundAdvice(joinpoint) {
 			// this should be the advised object
 			assert.equals(target, this);
 			assert.equals(target, joinpoint.target);
@@ -59,7 +59,7 @@ buster.testCase('around', {
 	'should allow multiple calls to proceed()': function() {
 		var target = new Fixture();
 
-		aop.around(target, 'method', function aroundAdvice(joinpoint) {
+		meld.around(target, 'method', function aroundAdvice(joinpoint) {
 			// Calling joinpoint.proceed() multiple times is allowed
 			assert.same(0, joinpoint.proceedCount());
 			refute.exception(joinpoint.proceed);
@@ -72,21 +72,20 @@ buster.testCase('around', {
 	},
 
 	'should be invoked from most recently added to least recently added': function() {
-		var inner, outer, target;
+		var inner, target;
 
 		inner = this.spy();
-		outer = this.spy();
 		target = new Fixture();
 
 		// Inner
-		aop.around(target, 'method', function aroundAdviceInner(joinpoint) {
+		meld.around(target, 'method', function aroundAdviceInner(joinpoint) {
 			inner();
 			// This will proceed to the original method
 			joinpoint.proceed();
 		});
 
 		// Outer
-		aop.around(target, 'method', function aroundAdviceOuter(joinpoint) {
+		meld.around(target, 'method', function aroundAdviceOuter(joinpoint) {
 			refute.calledOnce(inner);
 			// This will proceed to the inner around
 			joinpoint.proceed();
@@ -108,7 +107,7 @@ buster.testCase('around', {
 		// Starting value
 		assert.equals(0, target.val);
 
-		aop.around(target, 'method', function aroundAdvice(joinpoint) {
+		meld.around(target, 'method', function aroundAdvice(joinpoint) {
 			// arg should be the return value from the orig method
 			assert.equals(1, joinpoint.args.length);
 			assert.equals(arg, joinpoint.args[0]);
@@ -133,7 +132,7 @@ buster.testCase('around', {
 		// Starting value
 		assert.equals(0, target.val);
 
-		aop.around(target, 'method', function aroundAdvice(joinpoint) {
+		meld.around(target, 'method', function aroundAdvice(joinpoint) {
 			// arg should be the return value from the orig method
 			assert.equals(1, joinpoint.args.length);
 			assert.equals(arg, joinpoint.args[0]);
@@ -153,7 +152,7 @@ buster.testCase('around', {
 		var target = new Fixture();
 		target.method = this.stub().returns(0);
 
-		aop.around(target, 'method', function aroundAdvice(joinpoint) {
+		meld.around(target, 'method', function aroundAdvice(joinpoint) {
 			joinpoint.proceed();
 			return 1;
 		});
@@ -167,7 +166,7 @@ buster.testCase('around', {
 		target = new Fixture();
 		spy = target.method = this.spy();
 
-		aop.around(target, 'method', function aroundAdvice(joinpoint) {
+		meld.around(target, 'method', function aroundAdvice(/*joinpoint*/) {
 			// Don't proceed to original method
 			// joinpoint.proceed();
 			return 1;

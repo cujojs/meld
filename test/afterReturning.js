@@ -1,5 +1,5 @@
-(function(buster, aop) {
-"use strict";
+(function(buster, meld) {
+'use strict';
 
 var assert, refute, fail;
 
@@ -28,7 +28,7 @@ buster.testCase('afterReturning', {
 		// Starting value
 		assert.equals(0, target.val);
 
-		aop.afterReturning(target, 'method', function afterAdvice(a) {
+		meld.afterReturning(target, 'method', function afterAdvice(a) {
 			// this should be the advised object
 			assert.equals(target, this);
 
@@ -61,7 +61,7 @@ buster.testCase('afterReturning', {
 		// Starting value
 		assert.equals(0, target.val);
 
-		aop.afterReturning(target, 'method', function afterReturning0(a) {
+		meld.afterReturning(target, 'method', function afterReturning0(a) {
 			// this should be the advised object
 			assert.equals(target, this);
 
@@ -81,7 +81,7 @@ buster.testCase('afterReturning', {
 			count++;
 		});
 
-		aop.afterReturning(target, 'method', function afterReturning1(a) {
+		meld.afterReturning(target, 'method', function afterReturning1(a) {
 			// this should be the advised object
 			assert.equals(target, this);
 
@@ -98,7 +98,7 @@ buster.testCase('afterReturning', {
 			count++;
 		});
 
-		aop.afterReturning(target, 'method', function afterReturning2(a) {
+		meld.afterReturning(target, 'method', function afterReturning2(a) {
 			// this should be the advised object
 			assert.equals(target, this);
 
@@ -130,7 +130,7 @@ buster.testCase('afterReturning', {
 
 		spy = this.spy();
 
-		aop.afterReturning(target, 'method', spy);
+		meld.afterReturning(target, 'method', spy);
 
 		assert.exception(function() {
 			target.method(arg);

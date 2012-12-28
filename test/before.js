@@ -1,5 +1,5 @@
-(function(buster, aop) {
-"use strict";
+(function(buster, meld) {
+'use strict';
 
 var assert, refute;
 
@@ -23,7 +23,7 @@ buster.testCase('before', {
 	'should invoke advice before advised method': function() {
 		var target = new Fixture();
 
-		aop.before(target, 'method', function before1(a) {
+		meld.before(target, 'method', function before1(a) {
 			// this should be the advised object
 			assert.equals(target, this);
 
@@ -52,7 +52,7 @@ buster.testCase('before', {
 		// Add 3 before advices and test their invocation order,
 		// args, and return value
 
-		aop.before(target, 'method', function before0(a) {
+		meld.before(target, 'method', function before0(a) {
 			assert.equals(target, this);
 			assert.equals(arg, a);
 
@@ -66,7 +66,7 @@ buster.testCase('before', {
 			assert.equals(2, beforeCount);
 		});
 
-		aop.before(target, 'method', function before1(a) {
+		meld.before(target, 'method', function before1(a) {
 			assert.equals(target, this);
 			assert.equals(arg, a);
 
@@ -84,7 +84,7 @@ buster.testCase('before', {
 			beforeCount++;
 		});
 
-		aop.before(target, 'method', function before2(a) {
+		meld.before(target, 'method', function before2(a) {
 			assert.equals(target, this);
 			assert.equals(arg, a);
 

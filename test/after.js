@@ -1,5 +1,5 @@
-(function(buster, aop) {
-"use strict";
+(function(buster, meld) {
+'use strict';
 
 var assert, refute;
 
@@ -32,7 +32,7 @@ buster.testCase('after', {
 		// Starting value
 		assert.equals(0, target.val);
 
-		aop.after(target, 'method', function afterAdvice(a) {
+		meld.after(target, 'method', function afterAdvice(a) {
 			// this should be the advised object
 			assert.equals(target, this);
 
@@ -60,7 +60,7 @@ buster.testCase('after', {
 		// Starting value
 		assert.equals(0, target.val);
 
-		aop.after(target, 'method', function afterAdvice(a) {
+		meld.after(target, 'method', function afterAdvice(a) {
 			// this should be the advised object
 			assert.equals(target, this);
 

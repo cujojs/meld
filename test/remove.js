@@ -1,5 +1,5 @@
-(function(buster, aop) {
-"use strict";
+(function(buster, meld) {
+'use strict';
 
 var assert, refute;
 
@@ -19,7 +19,7 @@ buster.testCase('remove', {
 		fixture.method = function() {};
 
 		advice = this.spy();
-		ref = aop.before(fixture, 'method', advice);
+		ref = meld.before(fixture, 'method', advice);
 
 		assert.defined(fixture.method._advisor);
 
@@ -42,7 +42,7 @@ buster.testCase('remove', {
 		fixture.method2 = function() {};
 
 		advice = this.spy();
-		ref = aop.before(fixture, /method[12]/, advice);
+		ref = meld.before(fixture, /method[12]/, advice);
 
 		assert.defined(fixture.method1._advisor);
 		assert.defined(fixture.method2._advisor);
@@ -68,7 +68,7 @@ buster.testCase('remove', {
 		spy = fixture.method = this.spy();
 		advice = this.spy();
 
-		ref = aop.around(fixture, 'method', advice);
+		ref = meld.around(fixture, 'method', advice);
 
 		fixture.method();
 
@@ -96,7 +96,7 @@ buster.testCase('remove', {
 
 		fixture = new Fixture();
 		fixture.method = this.spy();
-		ref = aop.add(fixture, 'method', aspect);
+		ref = meld.add(fixture, 'method', aspect);
 
 		fixture.method();
 

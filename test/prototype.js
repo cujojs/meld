@@ -1,5 +1,5 @@
-(function(buster, aop) {
-"use strict";
+(function(buster, meld) {
+'use strict';
 
 var assert, refute;
 
@@ -16,7 +16,7 @@ buster.testCase('prototype', {
 		before = this.spy();
 
 		// Advise the prototype method
-		aop.before(Fixture.prototype, 'method', before);
+		meld.before(Fixture.prototype, 'method', before);
 
 		target = new Fixture();
 		target.method();
