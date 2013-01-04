@@ -8,7 +8,9 @@
 	* [After Throwing](#after-throwing)
 	* [After (Finally)](#after-finally)
 	* [Around](#around)
-		* [Joinpoint](#joinpoint)
+1. [Joinpoint](#joinpoint)
+	1. [Accessing the Joinpoint](#accessing-the-joinpoint)
+	2. [Around Joinpoint](#around-joinpoint)
 1. [Advice Order](#advice-order)
 1. [Advising Methods](#advising-methods)
 	* [Matching method names](#matching-method-names)
@@ -104,11 +106,37 @@ result = myObject.doSomething(1, 2);
 
 *Around* is the most powerful type of advice and, as its name implies, executes *around* another function.  It may execute code before and after the original function, modify the arguments passed to the original, or even elect to prevent the original function from executing at all (see the [Simple Caching Example](#simple-caching-example) above).
 
-Around advice receives a [Joinpoint](#joinpoint) as its only parameter, which it can use to access the original arguments, context, and method name of the original function, as well as allow the original function to continue, with either its original arguments, or a modified list of arguments.
+Around advice receives an [Around Joinpoint](#around-joinpoint) as its only parameter, which it can use to access the original arguments, context, and method name of the original function, as well as allow the original function to continue, with either its original arguments, or a modified list of arguments.
 
-### Joinpoint
+# Joinpoint
 
-A joinpoint is the point at which a method or function was intercepted.  Think of it as a description of the original function invocation.  It provides the arguments with which the original method was called, the method name (in the case of an object method), and its own methods for allowing the original method call to continue and getting its result.
+A joinpoint is the point at which a method or function was intercepted.  Think of it as a description of the original function invocation.  It provides the arguments with which the original method was called, the method name (in the case of an object method), and the context with which the method was called.
+
+A joinpoint has the following properties:
+
+* target - context with which the original method was called
+* method - String name of the method that was called
+* args - Array of arguments that were passed to the method
+
+## Accessing the Joinpoint
+
+Around advice always receives the current [around joinpoint](#around-joinpoint) as its only argument.
+
+From *inside* any other advice type (before, after, etc.) you may access the current joinpoint by calling `meld.joinpoint()`.  It will return the joinpoint within which the current advice function is executing.
+
+When called from *outside* an advice function, `meld.joinpoint()` always returns undefined.
+
+**IMPORTANT:** The returned joinpoint is only valid within the advice function where it was retrieved by calling `meld.joinpoint`.  You should not cache the joinpoint returned by `meld.joinpoint()` and attempt to use it outside of an advice function, or in different advice functions from that which it was originally retrieved.
+
+## Around Joinpoint
+
+Around advice receives as its only argument, an augmented joinpoint, sometimes called a "proceeding joinpoint".  It has the same fields as a regular joinpoint, with the addition of "proceed" methods for allowing the original method call to continue and getting its result.
+
+An around joinpoint has the following additional properties:
+
+* proceed() - function that around advice should call to proceed to the original method invocation.  You may pass arguments to `proceed()` and they will be used *instead of* the original arguments.  It will return the result of the original method, or throw an exception if the original method throws.
+* proceedApply:`Function` - similar to `proceed()` but accepts an Array of new arguments, e.g. `proceedApply([1, 2, 3])` is equivalent to `proceed(1, 2, 3)`
+* proceedCount() - function that returns the number of times that `proceed()` and/or `proceedApply()` have been called *within the current around advice*.
 
 # Advice Order
 
