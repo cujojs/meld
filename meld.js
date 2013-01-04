@@ -566,8 +566,5 @@ define(function () {
 	return meld;
 
 });
-})(typeof define == 'function' && define.amd
-	? define
-	: function (factory) { module.exports = factory(); }
-	// Boilerplate for AMD and CommonJS
+})(typeof define == 'function' && define.amd ? define : function (factory) { module.exports = factory(); }
 );
