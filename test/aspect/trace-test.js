@@ -15,29 +15,29 @@ buster.testCase('aspect/trace', {
 
 		spy = this.spy();
 		advised = { method: spy };
-		reporter = { called: this.spy() };
+		reporter = { onCall: this.spy() };
 
 		meld.add(advised, 'method', createTracer(reporter));
 
 		advised.method(sentinel);
 
 		assert.calledOnceWith(spy, sentinel);
-		assert.calledOnce(reporter.called);
+		assert.calledOnce(reporter.onCall);
 	},
 
 	'should call success upon returning from advised method': function() {
 		var advised, reporter;
 
 		advised = {
-			method: function() { refute.called(reporter.returned); }
+			method: function() { refute.called(reporter.onReturn); }
 		};
-		reporter = { returned: this.spy() };
+		reporter = { onReturn: this.spy() };
 
 		meld.add(advised, 'method', createTracer(reporter));
 
 		advised.method();
 
-		assert.calledOnce(reporter.returned);
+		assert.calledOnce(reporter.onReturn);
 	},
 
 	'should call fail upon throwing from advised method': function() {
@@ -45,17 +45,17 @@ buster.testCase('aspect/trace', {
 
 		advised = {
 			method: function() {
-				refute.called(reporter.threw);
+				refute.called(reporter.onThrow);
 				throw sentinel;
 			}
 		};
-		reporter = { threw: this.spy() };
+		reporter = { onThrow: this.spy() };
 
 		meld.add(advised, 'method', createTracer(reporter));
 
 		assert.exception(function() {
 			advised.method();
-			assert.calledOnce(reporter.threw);
+			assert.calledOnce(reporter.onThrow);
 		});
 	}
 

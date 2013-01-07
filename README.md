@@ -72,6 +72,12 @@ Run unit tests in Node:
 
 # Changelog
 
+### 1.2.0
+
+* `meld.joinpoint()` - Access the current joinpoint from any advice type.
+* Bundled aspects:
+	* trace: trace method call entry/return/throw
+
 ### 1.1.0
 
 * Advice can be applied directly to methods on a function.

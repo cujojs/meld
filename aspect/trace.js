@@ -17,13 +17,13 @@ define(function(require) {
 	padding =  '................................';
 
 	simpleReporter = {
-		called: function(info) {
+		onCall: function(info) {
 			console.log(indent(++depth) + info.method + ' CALL ', info.args);
 		},
-		returned: function(info) {
+		onReturn: function(info) {
 			console.log(indent(depth--) + info.method + ' RETURN ', info.result);
 		},
-		threw: function(info) {
+		onThrow: function(info) {
 			console.log(indent(depth--) + info.method + ' THROW ' + info.exception);
 		}
 	};
@@ -33,9 +33,9 @@ define(function(require) {
 	 * to the supplied reporter.
 	 * @param {object} [reporter] optional reporting API to which method call/return/throw
 	 *  info will be reported
-	 * @param {function} [reporter.called] invoked when a method has been called
-	 * @param {function} [reporter.returned] invoked when a method returns successfully
-	 * @param {function} [reporter.threw] invoked when a method throws an exception
+	 * @param {function} [reporter.onCall] invoked when a method has been called
+	 * @param {function} [reporter.onReturn] invoked when a method returns successfully
+	 * @param {function} [reporter.onThrow] invoked when a method throws an exception
 	 * @return {object} a tracing aspect that can be added with meld.add
 	 */
 	return function createTraceAspect(reporter) {
@@ -47,17 +47,17 @@ define(function(require) {
 		return {
 			before: function() {
 				var jp = joinpoint();
-				reporter.called && reporter.called({ method: jp.method, target: jp.target, args: jp.args.slice() });
+				reporter.onCall && reporter.onCall({ method: jp.method, target: jp.target, args: jp.args.slice() });
 			},
 
 			afterReturning: function(result) {
 				var jp = joinpoint();
-				reporter.returned && reporter.returned({ method: jp.method, target: jp.target, result: result });
+				reporter.onReturn && reporter.onReturn({ method: jp.method, target: jp.target, result: result });
 			},
 
 			afterThrowing: function(exception) {
 				var jp = joinpoint();
-				reporter.threw && reporter.threw({ method: jp.method, target: jp.target, exception: exception });
+				reporter.onThrow && reporter.onThrow({ method: jp.method, target: jp.target, exception: exception });
 			}
 		};
 	};
