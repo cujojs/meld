@@ -74,9 +74,11 @@ Run unit tests in Node:
 
 ### 1.2.0
 
-* `meld.joinpoint()` - Access the current joinpoint from any advice type.
-* Bundled aspects:
+* `meld.joinpoint()` - [Access the current joinpoint](meld/blob/master/docs/api.md#meldjoinpoint) from any advice type.
+* [Bundled aspects](meld/blob/master/docs/aspects.md):
 	* trace: trace method call entry/return/throw
+	* memoize: simple memoization for methods and functions
+	* cache: configurable caching aspect to do more than simple memoization
 
 ### 1.1.0
 
