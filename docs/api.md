@@ -177,7 +177,9 @@ In the specific case of a constructor, the newly constructed instance acts as th
 
 # Adding Multiple Advices
 
-Meld.js allows you to add any number of advices to a method, function, or constructor.  In addition to adding them individually, as [shown here](api.md#advising-methods), using the individual advice methods (e.g. meld.before, meld.after, etc.), you can also add several advices at once using `meld.add()`.
+Meld.js allows you to add any number of advices to a method, function, or constructor.  In addition to adding them individually, as [shown here](#advising-methods), using the individual advice methods (e.g. meld.before, meld.after, etc.), you can also add several advices at once using `meld.add()`.
+
+For example, the [bundled aspects](aspects.md) are implemented this way, and can be added using `meld.add()`.
 
 ## meld.add
 
