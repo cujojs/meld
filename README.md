@@ -27,6 +27,7 @@ myObject.doSomething(1, 2); // Nothing logged
 
 * [API](meld/blob/master/docs/api.md)
 * [Reference](meld/blob/master/docs/reference.md)
+* [Aspects](meld/blob/master/docs/aspects.md)
 
 # Quick Start
 
