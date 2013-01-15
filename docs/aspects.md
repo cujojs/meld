@@ -1,6 +1,6 @@
 # meld.js Bundled Aspects
 
-1. [Introduction]
+1. [Aspects](#aspects)
 1. [aspect/trace](#aspecttrace) - Method/function tracing
 1. [aspect/memoize](#aspectmemoize) - Simple memoization
 1. [aspect/cache](#aspectcache) - Caching
