@@ -89,6 +89,7 @@ var cache = require('meld/aspect/cache');
 var cached = meld.add(object, pointcut, cache(storage));
 // or
 var cached = meld.add(func, cache(storage));
+```
 
 Creates an aspect that can help in performing more sophisticated caching than the [memoize aspect](#aspectmemoize).  You must supply a cache storage object that implements the following API:
 
