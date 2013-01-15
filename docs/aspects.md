@@ -18,7 +18,7 @@ var trace = require('meld/aspect/trace');
 
 var traced = meld.add(object, pointcut, trace());
 // or
-var traced = meld.add(object, pointcut, trace());
+var traced = meld.add(func, trace());
 ```
 
 Creates an aspect that traces method and function calls, and to report when they are called, their parameters, and whether each returns successfully or throws an exception, with the associated return value or throw exception.  By default, the trace aspect uses a builtin reporter that simply logs information using `console.log`.
