@@ -53,9 +53,13 @@ define(function () {
 		return Object.prototype.toString.call(it) == '[object Array]';
 	};
 
-	defineProperty = Object.defineProperty || function(obj, prop, descriptor) {
-		obj[prop] = descriptor.value;
-	};
+	// Check for a *working* Object.defineProperty, fallback to
+	// simple assignment.
+	defineProperty = definePropertyWorks()
+		? Object.defineProperty
+		: function(obj, prop, descriptor) {
+			obj[prop] = descriptor.value;
+		};
 
 	iterators = {
 		// Before uses reverse iteration
@@ -561,6 +565,12 @@ define(function () {
 
 	function popJoinpoint() {
 		return currentJoinpoint = joinpointStack.pop();
+	}
+
+	function definePropertyWorks() {
+		try {
+			return 'xx' in Object.defineProperty({}, 'xx', {});
+		} catch (e) { /* return falsey */ }
 	}
 
 	return meld;
