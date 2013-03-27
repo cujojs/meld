@@ -68,7 +68,10 @@ define(function(require) {
 	 * @return {String} padding that can be used to indent tracing output
 	 */
 	function indent(depth) {
-		if(depth > padding.length) padding += padding;
+		if(depth > padding.length) {
+			padding += padding;
+		}
+
 		return padding.slice(0, depth-1);
 	}
 

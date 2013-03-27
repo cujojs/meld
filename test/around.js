@@ -6,7 +6,7 @@ var assert, refute;
 assert = buster.assert;
 refute = buster.refute;
 
-var arg = "foo"; // const
+var arg = 'foo'; // const
 
 // Test fixture
 function Fixture() {

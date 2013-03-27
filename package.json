@@ -1,6 +1,6 @@
 {
 	"name": "meld",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "AOP for JS with before, around, on, afterReturning, afterThrowing, after advice, and pointcut support",
 	"keywords": ["aop", "aspect", "cujo"],
 	"licenses": [
@@ -27,13 +27,14 @@
 		}
 	],
 	"devDependencies": {
-		"buster": "~0.6"
+		"buster": "~0.6",
+		"jshint": "~1"
 	},
 	"main": "meld",
 	"directories": {
 		"test": "test"
 	},
 	"scripts": {
-		"test": "buster test -e node"
+		"test": "jshint . && buster test -e node"
 	}
 }

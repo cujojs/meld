@@ -56,7 +56,7 @@
 			var stubKeyGenerator, advised;
 
 			stubKeyGenerator = this.stub().returns('the key');
-			advised = { method: function(x, y) {} };
+			advised = { method: function(/*x, y*/) {} };
 
 			meld.add(advised, 'method', createMemoizer(stubKeyGenerator));
 

@@ -6,7 +6,7 @@ var assert, refute;
 assert = buster.assert;
 refute = buster.refute;
 
-var arg = "foo"; // const
+var arg = 'foo'; // const
 
 // Test fixture
 function Fixture(shouldThrow) {
@@ -15,7 +15,7 @@ function Fixture(shouldThrow) {
 }
 
 Fixture.prototype = {
-	method: function(a) {
+	method: function() {
 		this.val++;
 		if(this.shouldThrow) {
 			throw new Error('testing after advice with throw');

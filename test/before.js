@@ -6,7 +6,7 @@ var assert, refute;
 assert = buster.assert;
 refute = buster.refute;
 
-var arg = "foo"; // const
+var arg = 'foo'; // const
 
 // Test fixture
 function Fixture() {
@@ -14,7 +14,7 @@ function Fixture() {
 }
 
 Fixture.prototype = {
-	method: function(a) {
+	method: function() {
 		return (++this.val);
 	}
 };
@@ -44,7 +44,7 @@ buster.testCase('before', {
 		assert.equals(ret, target.val);
 
 	},
-	
+
 	'should invoke most recently added advices first': function() {
 		var target = new Fixture();
 		var beforeCount = 0;

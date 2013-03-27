@@ -1,5 +1,4 @@
 (function(buster, meld) {
-'use strict';
 
 var assert, refute, arg;
 
@@ -26,6 +25,7 @@ function FixtureThrows(a) {
 
 buster.testCase('constructors', {
 	'should provide correct context to advice types': function() {
+		/*jshint nonew:false*/
 		var Advised, count;
 
 		Advised = Fixture;
@@ -52,6 +52,7 @@ buster.testCase('constructors', {
 	},
 
 	'should provide correct context to afterThrowing': function() {
+		/*jshint nonew:false*/
 		var Advised;
 
 		Advised = meld.afterThrowing(FixtureThrows, verifyContext);

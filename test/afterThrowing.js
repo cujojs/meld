@@ -7,7 +7,7 @@ assert = buster.assert;
 refute = buster.refute;
 fail = buster.assertions.fail;
 
-var arg = "foo"; // const
+var arg = 'foo'; // const
 
 // Test fixture
 function Fixture() {
@@ -15,7 +15,7 @@ function Fixture() {
 }
 
 Fixture.prototype = {
-	method: function(a) {
+	method: function() {
 		this.val++;
 		throw new Error('testing afterThrowing');
 	}

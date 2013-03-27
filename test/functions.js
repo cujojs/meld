@@ -50,7 +50,7 @@ buster.testCase('functions', {
 	},
 
 	'should advise a method on a function': function() {
-		var before, method, target;
+		var before, method;
 
 		function target() {}
 		method = target.method = this.spy();

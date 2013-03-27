@@ -104,7 +104,7 @@ buster.testCase('pointcuts', {
 		before = this.spy();
 
 		meld.add(target,
-			function(target) {
+			function() {
 				return ['method1', 'method3'];
 			},
 			{
