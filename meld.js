@@ -15,7 +15,7 @@
 define(function () {
 
 	var meld, currentJoinpoint, joinpointStack,
-		ap, prepend, append, iterators, slice, isArray, defineProperty;
+		ap, prepend, append, iterators, slice, isArray, defineProperty, objectCreate;
 
 	//
 	// Public API
@@ -62,6 +62,17 @@ define(function () {
 			obj[prop] = descriptor.value;
 		};
 
+	objectCreate = Object.create ||
+		(function() {
+			function F() {}
+			return function(proto) {
+				F.prototype = proto;
+				var instance = new F();
+				F.prototype = null;
+				return instance;
+			};
+		}());
+
 	iterators = {
 		// Before uses reverse iteration
 		before: forEachReverse,
@@ -94,14 +105,9 @@ define(function () {
 			// If called as a constructor (i.e. using "new"), create a context
 			// of the correct type, so that all advice types (including before!)
 			// are called with the correct context.
-			// NOTE: Requires ES5 Object.create()
 			if(this instanceof advised) {
 				// shamelessly derived from https://github.com/cujojs/wire/blob/c7c55fe50238ecb4afbb35f902058ab6b32beb8f/lib/component.js#L25
-				if (!Object.create) {
-					throw new Error('An ES5 environment is required for advice on constructors');
-				}
-
-				context = Object.create(orig.prototype);
+				context = objectCreate(orig.prototype);
 				callOrig = function (args) {
 					return applyConstructor(orig, context, args);
 				};

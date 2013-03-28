@@ -231,8 +231,6 @@ function myBeforeAdvice() {
 
 # Constructor-specific Info
 
-**IMPORTANT:** An ES5-compliant `Object.create()` must be available to advise constructors.  If you're running in an environment that does not provide `Object.create()`, and need to advise constructors, you must use a shim, such as [cujo.js's poly](https://github.com/cujojs/poly), or [es5-shim](https://github.com/kriskowal/es5-shim)
-
 Advising constructors has a few particulars that are worth noting, or different from advising non-constructor functions and methods.  Specifically:
 
 1. In most cases, the return value of a constructor is the newly constructed instance, and thus it will be the argument provided to afterReturning advice, and to after advice when the constructor returns successfully (i.e. doesn't throw).
