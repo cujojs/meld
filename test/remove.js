@@ -13,7 +13,7 @@ buster.testCase('remove', {
 	'should remove advisor': function() {
 		// Just test that the advisor is added, and then
 		// removed when the final aspect is removed
-		var fixture, ref, advice;
+		var fixture, ref, advice, advised;
 
 		fixture = new Fixture();
 		fixture.method = function() {};
@@ -22,6 +22,7 @@ buster.testCase('remove', {
 		ref = meld.before(fixture, 'method', advice);
 
 		assert.defined(fixture.method._advisor);
+		advised = fixture.method;
 
 		fixture.method();
 		assert.calledOnce(advice);
@@ -29,6 +30,7 @@ buster.testCase('remove', {
 		ref.remove();
 
 		refute('_advisor' in fixture.method);
+		refute('_advisor' in advised);
 
 		fixture.method();
 		refute.calledTwice(advice);

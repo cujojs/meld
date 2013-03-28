@@ -58,6 +58,7 @@ define(function () {
 	defineProperty = definePropertyWorks()
 		? Object.defineProperty
 		: function(obj, prop, descriptor) {
+			console.log('polyfill');
 			obj[prop] = descriptor.value;
 		};
 
@@ -162,7 +163,7 @@ define(function () {
 			}
 		};
 
-		defineProperty(advised, '_advisor', { value: advisor });
+		defineProperty(advised, '_advisor', { value: advisor, configurable: true });
 	}
 
 	Advisor.prototype = {
