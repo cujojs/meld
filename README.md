@@ -76,6 +76,7 @@ Run unit tests in Node:
 ### 1.2.1
 
 * Fix for IE8-specific issue with meld's internal use of `Object.defineProperty`.
+* Internally shim Object.create if not available to so that meld no longer requires an Object.create shim to advise constructors in pre-ES5 environments.
 
 ### 1.2.0
 
