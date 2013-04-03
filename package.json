@@ -3,6 +3,7 @@
 	"version": "1.2.1",
 	"description": "AOP for JS with before, around, on, afterReturning, afterThrowing, after advice, and pointcut support",
 	"keywords": ["aop", "aspect", "cujo"],
+	"homepage": "http://cujojs.com",
 	"licenses": [
 		{
 			"type": "MIT",
@@ -24,6 +25,19 @@
 		{
 			"name": "John Hann",
 			"web": "http://unscriptable.com"
+		}
+	],
+	"contributors": [
+		{
+			"name": "Brian Cavalier",
+			"web": "http://hovercraftstudios.com"
+		},
+		{
+			"name": "John Hann",
+			"web": "http://unscriptable.com"
+		},
+		{
+			"name": "Scott Andrews"
 		}
 	],
 	"devDependencies": {
