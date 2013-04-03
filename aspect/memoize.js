@@ -1,6 +1,10 @@
+/** @license MIT License (c) copyright 2011-2013 original author or authors */
+
 /**
  * Simple memoization aspect
- * @author: brian@hovercraftstudios.com
+ *
+ * @author Brian Cavalier
+ * @author John Hann
  */
 (function(define) {
 define(function(require) {

@@ -1,4 +1,4 @@
-/** @license MIT License (c) copyright B Cavalier & J Hann */
+/** @license MIT License (c) copyright 2011-2013 original author or authors */
 
 /**
  * meld
@@ -9,7 +9,9 @@
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @version 1.2.0
+ * @author Brian Cavalier
+ * @author John Hann
+ * @version 1.2.1
  */
 (function (define) {
 define(function () {

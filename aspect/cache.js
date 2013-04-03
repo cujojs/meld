@@ -1,7 +1,11 @@
+/** @license MIT License (c) copyright 2011-2013 original author or authors */
+
 /**
  * Caching aspect
  * Requires JSON.stringify. See cujojs/poly if you need a JSON polyfill
- * @author: brian@hovercraftstudios.com
+ *
+ * @author Brian Cavalier
+ * @author John Hann
  */
 (function(define) {
 define(function() {
