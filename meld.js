@@ -576,7 +576,7 @@ define(function () {
 
 	function definePropertyWorks() {
 		try {
-			return 'xx' in Object.defineProperty({}, 'xx', {});
+			return 'x' in Object.defineProperty({}, 'x', {});
 		} catch (e) { /* return falsey */ }
 	}
 
