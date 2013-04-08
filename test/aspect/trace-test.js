@@ -17,7 +17,7 @@ buster.testCase('aspect/trace', {
 		advised = { method: spy };
 		reporter = { onCall: this.spy() };
 
-		meld.add(advised, 'method', createTracer(reporter));
+		meld(advised, 'method', createTracer(reporter));
 
 		advised.method(sentinel);
 
@@ -33,7 +33,7 @@ buster.testCase('aspect/trace', {
 		};
 		reporter = { onReturn: this.spy() };
 
-		meld.add(advised, 'method', createTracer(reporter));
+		meld(advised, 'method', createTracer(reporter));
 
 		advised.method();
 
@@ -51,7 +51,7 @@ buster.testCase('aspect/trace', {
 		};
 		reporter = { onThrow: this.spy() };
 
-		meld.add(advised, 'method', createTracer(reporter));
+		meld(advised, 'method', createTracer(reporter));
 
 		assert.exception(function() {
 			advised.method();

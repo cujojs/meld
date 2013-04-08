@@ -98,7 +98,7 @@ buster.testCase('remove', {
 
 		fixture = new Fixture();
 		fixture.method = this.spy();
-		ref = meld.add(fixture, 'method', aspect);
+		ref = meld(fixture, 'method', aspect);
 
 		fixture.method();
 

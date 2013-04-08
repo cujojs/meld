@@ -16,7 +16,7 @@
 			spy = this.spy();
 			advised = { method: spy };
 
-			meld.add(advised, 'method', createMemoizer());
+			meld(advised, 'method', createMemoizer());
 
 			advised.method(param);
 
@@ -29,7 +29,7 @@
 			spy = this.spy();
 			advised = { method: spy };
 
-			meld.add(advised, 'method', createMemoizer());
+			meld(advised, 'method', createMemoizer());
 
 			advised.method(param);
 			advised.method(param);
@@ -44,7 +44,7 @@
 			spy = this.spy();
 			advised = { method: spy };
 
-			meld.add(advised, 'method', createMemoizer());
+			meld(advised, 'method', createMemoizer());
 
 			advised.method(param, 1);
 			advised.method(param, 2);
@@ -58,7 +58,7 @@
 			stubKeyGenerator = this.stub().returns('the key');
 			advised = { method: function(/*x, y*/) {} };
 
-			meld.add(advised, 'method', createMemoizer(stubKeyGenerator));
+			meld(advised, 'method', createMemoizer(stubKeyGenerator));
 
 			advised.method(param, 1);
 

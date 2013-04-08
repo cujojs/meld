@@ -7,8 +7,8 @@
 	* [meld.afterReturning](#meldafterreturning)
 	* [meld.afterThrowing](#meldafterthrowing)
 	* [meld.after](#meldafter)
-1. [Adding Multiple Advices](#adding-multiple-advices)
-	* [meld.add](#meldadd)
+1. [Adding Aspects](#adding-aspects)
+	* [meld](#meld)
 1. [Removing Method Advice](#removing-method-advice)
 1. [Accessing the Joinpoint](#accessing-the-joinpoint)
 	* [meld.joinpoint](#meldjoinpoint)
@@ -175,13 +175,15 @@ Returns a new function or constructor that calls `afterFunction` after the origi
 
 In the specific case of a constructor, the newly constructed instance acts as the return value, and will be the argument provided to the `afterFunction` when the constructor returns successfully.
 
-# Adding Multiple Advices
+# Adding Aspects
 
-Meld.js allows you to add any number of advices to a method, function, or constructor.  In addition to adding them individually, as [shown here](#advising-methods), using the individual advice methods (e.g. meld.before, meld.after, etc.), you can also add several advices at once using `meld.add()`.
+Meld.js allows you to add any number of advices to a method, function, or constructor.  In addition to adding them individually, as [shown here](#advising-methods), using the individual advice methods (e.g. meld.before, meld.after, etc.), you can also add several advices at once using `meld()`.
 
-For example, the [bundled aspects](aspects.md) are implemented this way, and can be added using `meld.add()`.
+For example, the [bundled aspects](aspects.md) are implemented this way, and can be added using `meld()`.
 
-## meld.add
+## meld
+
+**DEPRECATED ALIAS:** meld.add()
 
 ```js
 // Supply any or all of the advice types at once
@@ -197,15 +199,15 @@ var advices = {
 	}
 }
 
-var remover = meld.add(object, match, advices);
+var remover = meld(object, match, advices);
 ```
 
 Adds multiple advices to each matched method.
 
 ```js
-var advisedFunction = meld.add(functionToAdvise, advices);
+var advisedFunction = meld(functionToAdvise, advices);
 
-var AdvisedConstructor = meld.add(ConstructorToAdvise, advices);
+var AdvisedConstructor = meld(ConstructorToAdvise, advices);
 ```
 
 Adds multiple advices to the supplied function or constructor.

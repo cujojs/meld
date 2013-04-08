@@ -7,7 +7,7 @@
 
 # Aspects
 
-Besides adding individual advices, such as before, afterReturning, etc., meld supports adding aspects, which are essentially one or more pieces of advice that work together to implement some functionality.  Aspects can be added using [meld.add](api.md#adding-multiple-advices)
+Besides adding individual advices, such as before, afterReturning, etc., meld supports adding aspects, which are essentially one or more pieces of advice that work together to implement some functionality.  Aspects can be added using [meld](api.md#adding-aspects)
 
 Meld comes with several aspects, in the `aspect` dir, that you can use, and that serve as examples for implementing your own.
 
@@ -16,9 +16,9 @@ Meld comes with several aspects, in the `aspect` dir, that you can use, and that
 ```js
 var trace = require('meld/aspect/trace');
 
-var traced = meld.add(object, pointcut, trace());
+var traced = meld(object, pointcut, trace());
 // or
-var traced = meld.add(func, trace());
+var traced = meld(func, trace());
 ```
 
 Creates an aspect that traces method and function calls, and to report when they are called, their parameters, and whether each returns successfully or throws an exception, with the associated return value or throw exception.  By default, the trace aspect uses a builtin reporter that simply logs information using `console.log`.
@@ -52,7 +52,7 @@ var myReporter = {
 	}
 }
 
-var traced = meld.add(object, pointcut, trace(myReporter));
+var traced = meld(object, pointcut, trace(myReporter));
 ```
 
 # aspect/memoize
@@ -60,9 +60,9 @@ var traced = meld.add(object, pointcut, trace(myReporter));
 ```js
 var memoize = require('meld/aspect/memoize');
 
-var memoized = meld.add(object, pointcut, memoize());
+var memoized = meld(object, pointcut, memoize());
 // or
-var memoized = meld.add(func, memoize());
+var memoized = meld(func, memoize());
 ```
 
 Creates an aspect that [memoizes](http://en.wikipedia.org/wiki/Memoization) a method or function.  The first call to any memoized method or function with a specific set of params will always execute the original method/function.  The result will be stored in a table for fast lookup the next time the method/function is invoked *with the same params*.  Thus, subsequent calls to the memoized method/function with previously used params will always return a value from the map.
@@ -78,7 +78,7 @@ function myKeyGenerator(paramsArray) {
 	return key;
 }
 
-var memoized = meld.add(object, pointcut, memoize(myKeyGenerator));
+var memoized = meld(object, pointcut, memoize(myKeyGenerator));
 ```
 
 # aspect/cache
@@ -86,9 +86,9 @@ var memoized = meld.add(object, pointcut, memoize(myKeyGenerator));
 ```js
 var cache = require('meld/aspect/cache');
 
-var cached = meld.add(object, pointcut, cache(storage));
+var cached = meld(object, pointcut, cache(storage));
 // or
-var cached = meld.add(func, cache(storage));
+var cached = meld(func, cache(storage));
 ```
 
 Creates an aspect that can help in performing more sophisticated caching than the [memoize aspect](#aspectmemoize).  You must supply a cache storage object that implements the following API:
@@ -121,5 +121,5 @@ function myKeyGenerator(paramsArray) {
 	return key;
 }
 
-var cached = meld.add(object, pointcut, cache(storage, myKeyGenerator));
+var cached = meld(object, pointcut, cache(storage, myKeyGenerator));
 ```

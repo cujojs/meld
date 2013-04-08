@@ -23,7 +23,7 @@ buster.testCase('aspect/cache', {
 			set: noop
 		};
 
-		meld.add(advised, 'method', createCache(cache));
+		meld(advised, 'method', createCache(cache));
 
 		advised.method(param);
 
@@ -42,7 +42,7 @@ buster.testCase('aspect/cache', {
 			get: this.stub().returns(sentinel)
 		};
 
-		meld.add(advised, 'method', createCache(cache));
+		meld(advised, 'method', createCache(cache));
 
 		assert.same(advised.method(param), sentinel);
 
@@ -60,7 +60,7 @@ buster.testCase('aspect/cache', {
 			set: this.spy()
 		};
 
-		meld.add(advised, 'method', createCache(cache));
+		meld(advised, 'method', createCache(cache));
 
 		advised.method(param);
 
@@ -80,7 +80,7 @@ buster.testCase('aspect/cache', {
 			get: this.stub()
 		};
 
-		meld.add(advised, 'method', createCache(cache, stubKeyGenerator));
+		meld(advised, 'method', createCache(cache, stubKeyGenerator));
 
 		advised.method(param, 1);
 

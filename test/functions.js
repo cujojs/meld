@@ -32,7 +32,7 @@ buster.testCase('functions', {
 		spyAround = this.spy();
 		spyAfter  = this.spy();
 
-		advised = meld.add(f, {
+		advised = meld(f, {
 			before: spyBefore,
 			around: function(call) {
 				var ret = call.proceed();

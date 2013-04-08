@@ -18,7 +18,7 @@ buster.testCase('pointcuts', {
 
 		before = this.spy();
 
-		meld.add(target, 'method1', {
+		meld(target, 'method1', {
 			before: before
 		});
 
@@ -43,7 +43,7 @@ buster.testCase('pointcuts', {
 
 		before = this.spy();
 
-		meld.add(target, ['method1', 'method3'], {
+		meld(target, ['method1', 'method3'], {
 			before: before
 		});
 
@@ -73,7 +73,7 @@ buster.testCase('pointcuts', {
 
 		before = this.spy();
 
-		meld.add(target, /method[13]/, {
+		meld(target, /method[13]/, {
 			before: before
 		});
 
@@ -103,7 +103,7 @@ buster.testCase('pointcuts', {
 
 		before = this.spy();
 
-		meld.add(target,
+		meld(target,
 			function() {
 				return ['method1', 'method3'];
 			},
