@@ -1,6 +1,6 @@
 {
 	"name": "meld",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "AOP for JS with before, around, on, afterReturning, afterThrowing, after advice, and pointcut support",
 	"keywords": ["aop", "aspect", "cujo"],
 	"homepage": "http://cujojs.com",

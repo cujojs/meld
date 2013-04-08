@@ -5,8 +5,7 @@
 
 	"predef": [
         "define",
-        "module",
-        "system"
+        "module"
     ],
 
 	"boss": true,

@@ -11,7 +11,7 @@
  *
  * @author Brian Cavalier
  * @author John Hann
- * @version 1.2.1
+ * @version 1.2.2
  */
 (function (define) {
 define(function () {
@@ -53,9 +53,6 @@ define(function () {
 	 *  aspect. If target is a function, returns the newly advised function.
 	 */
 	function meld(target, pointcut, aspect) {
-		// pointcut can be: string, Array of strings, RegExp, Function(targetObject): Array of strings
-		// advice can be: object, Function(targetObject, targetMethodName)
-
 		var pointcutType, remove;
 
 		if(arguments.length < 3) {
@@ -63,7 +60,6 @@ define(function () {
 		} else {
 			if (isArray(pointcut)) {
 				remove = addAspectToAll(target, pointcut, aspect);
-
 			} else {
 				pointcutType = typeof pointcut;
 
