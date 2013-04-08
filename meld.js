@@ -16,79 +16,74 @@
 (function (define) {
 define(function () {
 
-	var meld, currentJoinpoint, joinpointStack,
-		ap, prepend, append, iterators, slice, isArray, defineProperty, objectCreate;
-
 	//
 	// Public API
 	//
 
-	meld = {
-		// General add aspect
-		// Returns a function that will remove the newly-added aspect
-		add:            addAspect,
+	// Add a single, specific type of advice
+	// returns a function that will remove the newly-added advice
+	meld.before =         adviceApi('before');
+	meld.around =         adviceApi('around');
+	meld.on =             adviceApi('on');
+	meld.afterReturning = adviceApi('afterReturning');
+	meld.afterThrowing =  adviceApi('afterThrowing');
+	meld.after =          adviceApi('after');
 
-		// Add a single, specific type of advice
-		// returns a function that will remove the newly-added advice
-		before:         adviceApi('before'),
-		around:         adviceApi('around'),
-		on:             adviceApi('on'),
-		afterReturning: adviceApi('afterReturning'),
-		afterThrowing:  adviceApi('afterThrowing'),
-		after:          adviceApi('after'),
+	// Access to the current joinpoint in advices
+	meld.joinpoint =      joinpoint;
 
-		// Access to the current joinpoint in advices
-		joinpoint:      joinpoint
-	};
+	// DEPRECATED: meld.add(). meld() is a function, use it instead
+	// Returns a function that will remove the newly-added aspect
+	meld.add =            function() { return meld.apply(null, arguments); };
 
-	// TOOD: Freeze joinpoints when v8 perf problems are resolved
-//	freeze = Object.freeze || function (o) { return o; };
+	/**
+	 * Add an aspect to all matching methods of target, or to target itself if
+	 * target is a function and no pointcut is provided.
+	 * @param {object|function} target
+	 * @param {string|array|RegExp|function} [pointcut]
+	 * @param {object} aspect
+	 * @param {function?} aspect.before
+	 * @param {function?} aspect.on
+	 * @param {function?} aspect.around
+	 * @param {function?} aspect.afterReturning
+	 * @param {function?} aspect.afterThrowing
+	 * @param {function?} aspect.after
+	 * @returns {{ remove: function }|function} if target is an object, returns a
+	 *  remover { remove: function } whose remove method will remove the added
+	 *  aspect. If target is a function, returns the newly advised function.
+	 */
+	function meld(target, pointcut, aspect) {
+		// pointcut can be: string, Array of strings, RegExp, Function(targetObject): Array of strings
+		// advice can be: object, Function(targetObject, targetMethodName)
 
-	joinpointStack = [];
+		var pointcutType, remove;
 
-	ap      = Array.prototype;
-	prepend = ap.unshift;
-	append  = ap.push;
-	slice   = ap.slice;
+		if(arguments.length < 3) {
+			return addAspectToFunction(target, pointcut);
+		} else {
+			if (isArray(pointcut)) {
+				remove = addAspectToAll(target, pointcut, aspect);
 
-	isArray = Array.isArray || function(it) {
-		return Object.prototype.toString.call(it) == '[object Array]';
-	};
+			} else {
+				pointcutType = typeof pointcut;
 
-	// Check for a *working* Object.defineProperty, fallback to
-	// simple assignment.
-	defineProperty = definePropertyWorks()
-		? Object.defineProperty
-		: function(obj, prop, descriptor) {
-			console.log('polyfill');
-			obj[prop] = descriptor.value;
-		};
+				if (pointcutType === 'string') {
+					if (typeof target[pointcut] === 'function') {
+						remove = addAspectToMethod(target, pointcut, aspect);
+					}
 
-	objectCreate = Object.create ||
-		(function() {
-			function F() {}
-			return function(proto) {
-				F.prototype = proto;
-				var instance = new F();
-				F.prototype = null;
-				return instance;
-			};
-		}());
+				} else if (pointcutType === 'function') {
+					remove = addAspectToAll(target, pointcut(target), aspect);
 
-	iterators = {
-		// Before uses reverse iteration
-		before: forEachReverse,
-		around: false
-	};
+				} else {
+					remove = addAspectToMatches(target, pointcut, aspect);
+				}
+			}
 
-	// All other advice types use forward iteration
-	// Around is a special case that uses recursion rather than
-	// iteration.  See Advisor._callAroundAdvice
-	iterators.on
-		= iterators.afterReturning
-		= iterators.afterThrowing
-		= iterators.after
-		= forEach;
+			return remove;
+		}
+
+	}
 
 	function Advisor(target, func) {
 
@@ -365,39 +360,6 @@ define(function () {
 		return advisor;
 	};
 
-	function addAspect(target, pointcut, aspect) {
-		// pointcut can be: string, Array of strings, RegExp, Function(targetObject): Array of strings
-		// advice can be: object, Function(targetObject, targetMethodName)
-
-		var pointcutType, remove;
-
-		if(arguments.length < 3) {
-			return addAspectToFunction(target, pointcut);
-		} else {
-			if (isArray(pointcut)) {
-				remove = addAspectToAll(target, pointcut, aspect);
-
-			} else {
-				pointcutType = typeof pointcut;
-
-				if (pointcutType === 'string') {
-					if (typeof target[pointcut] === 'function') {
-						remove = addAspectToMethod(target, pointcut, aspect);
-					}
-
-				} else if (pointcutType === 'function') {
-					remove = addAspectToAll(target, pointcut(target), aspect);
-
-				} else {
-					remove = addAspectToMatches(target, pointcut, aspect);
-				}
-			}
-
-			return remove;
-		}
-
-	}
-
 	/**
 	 * Add an aspect to a pure function, returning an advised version of it.
 	 * NOTE: *only the returned function* is advised.  The original (input) function
@@ -472,10 +434,10 @@ define(function () {
 
 			if(arguments.length === 2) {
 				aspect[type] = method;
-				return addAspect(target, aspect);
+				return meld(target, aspect);
 			} else {
 				aspect[type] = adviceFunc;
-				return addAspect(target, method, aspect);
+				return meld(target, method, aspect);
 			}
 		};
 	}
@@ -550,6 +512,57 @@ define(function () {
 
 		return instance;
 	}
+
+	var currentJoinpoint, joinpointStack,
+		ap, prepend, append, iterators, slice, isArray, defineProperty, objectCreate;
+
+	// TOOD: Freeze joinpoints when v8 perf problems are resolved
+//	freeze = Object.freeze || function (o) { return o; };
+
+	joinpointStack = [];
+
+	ap      = Array.prototype;
+	prepend = ap.unshift;
+	append  = ap.push;
+	slice   = ap.slice;
+
+	isArray = Array.isArray || function(it) {
+		return Object.prototype.toString.call(it) == '[object Array]';
+	};
+
+	// Check for a *working* Object.defineProperty, fallback to
+	// simple assignment.
+	defineProperty = definePropertyWorks()
+		? Object.defineProperty
+		: function(obj, prop, descriptor) {
+		obj[prop] = descriptor.value;
+	};
+
+	objectCreate = Object.create ||
+		(function() {
+			function F() {}
+			return function(proto) {
+				F.prototype = proto;
+				var instance = new F();
+				F.prototype = null;
+				return instance;
+			};
+		}());
+
+	iterators = {
+		// Before uses reverse iteration
+		before: forEachReverse,
+		around: false
+	};
+
+	// All other advice types use forward iteration
+	// Around is a special case that uses recursion rather than
+	// iteration.  See Advisor._callAroundAdvice
+	iterators.on
+		= iterators.afterReturning
+		= iterators.afterThrowing
+		= iterators.after
+		= forEach;
 
 	function forEach(array, func) {
 		for (var i = 0, len = array.length; i < len; i++) {
