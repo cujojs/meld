@@ -1,3 +1,7 @@
+### 1.2.2
+
+* Remove stray `console.log`.
+
 ### 1.2.1
 
 * Fix for IE8-specific issue with meld's internal use of `Object.defineProperty`.

@@ -11,7 +11,7 @@
  *
  * @author Brian Cavalier
  * @author John Hann
- * @version 1.2.1
+ * @version 1.2.2
  */
 (function (define) {
 define(function () {
