@@ -60,7 +60,6 @@ define(function () {
 	defineProperty = definePropertyWorks()
 		? Object.defineProperty
 		: function(obj, prop, descriptor) {
-			console.log('polyfill');
 			obj[prop] = descriptor.value;
 		};
 
