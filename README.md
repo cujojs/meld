@@ -75,7 +75,7 @@ Run unit tests in Node:
 
 ### 1.3.0
 
-* `meld()` is now a function that adds aspects.
+* [`meld()`](docs/api.md#adding-aspects) is now a function that adds aspects.
 	* **DEPRECATED:** `meld.add()`.  Use `meld()` instead.
 
 ### 1.2.2
