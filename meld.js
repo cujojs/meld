@@ -11,7 +11,7 @@
  *
  * @author Brian Cavalier
  * @author John Hann
- * @version 1.2.2
+ * @version 1.3.0
  */
 (function (define) {
 define(function () {
@@ -32,7 +32,7 @@ define(function () {
 	// Access to the current joinpoint in advices
 	meld.joinpoint =      joinpoint;
 
-	// DEPRECATED: meld.add(). meld() is a function, use it instead
+	// DEPRECATED: meld.add(). Use meld() instead
 	// Returns a function that will remove the newly-added aspect
 	meld.add =            function() { return meld.apply(null, arguments); };
 
