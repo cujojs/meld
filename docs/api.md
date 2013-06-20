@@ -44,7 +44,7 @@ function aroundFunction(joinpoint) {
 var remover = meld.around(object, match, aroundFunction);
 ```
 
-Adds around advice to matching methods.  The `beforeFunction` will be called around the matching method.
+Adds around advice to matching methods.  The `aroundFunction` will be called around the matching method.
 
 ```js
 var advisedFunction = meld.around(functionToAdvise, aroundFunction);
@@ -52,7 +52,7 @@ var advisedFunction = meld.around(functionToAdvise, aroundFunction);
 var AdvisedConstructor = meld.around(ConstructorToAdvise, aroundFunction);
 ```
 
-Returns a new function or constructor that calls `beforeFunction` before executing the original behavior of `functionToAdvise`/`ConstructorToAdvice`, leaving the original untouched.
+Returns a new function or constructor that calls `aroundFunction` before executing the original behavior of `functionToAdvise`/`ConstructorToAdvice`, leaving the original untouched.
 
 ### joinpoint
 
@@ -102,7 +102,7 @@ var advisedFunction = meld.on(functionToAdvise, onFunction);
 var AdvisedConstructor = meld.on(ConstructorToAdvise, onFunction);
 ```
 
-Returns a new function or constructor that calls `beforeFunction` immediately after executing the original behavior of `functionToAdvise`/`ConstructorToAdvice`, leaving the original untouched.
+Returns a new function or constructor that calls `onFunction` immediately after executing the original behavior of `functionToAdvise`/`ConstructorToAdvice`, leaving the original untouched.
 
 ## meld.afterReturning
 
