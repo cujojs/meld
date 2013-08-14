@@ -594,5 +594,13 @@ define(function () {
 	return meld;
 
 });
-})(typeof define == 'function' && define.amd ? define : function (factory) { module.exports = factory(); }
+})(typeof define == 'function' && define.amd ? 
+    define : 
+    function (factory) { 
+        if(typeof window == 'undefined') {
+            module.exports = factory(); 
+        } else {
+            window.meld = factory();
+        }
+    }
 );
