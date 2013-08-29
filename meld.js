@@ -330,7 +330,7 @@ define(function () {
 	/**
 	 * Returns the advisor for the target object-function pair.  A new advisor
 	 * will be created if one does not already exist.
-	 * @param target {*} target containing a method with tthe supplied methodName
+	 * @param target {*} target containing a method with the supplied methodName
 	 * @param methodName {String} name of method on target for which to get an advisor
 	 * @return {Object|undefined} existing or newly created advisor for the supplied method
 	 */
