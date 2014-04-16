@@ -1,3 +1,8 @@
+### 1.3.1
+
+* Added `bower.json`
+* Added a proper `npmignore` to install only what's needed.
+
 ### 1.3.0
 
 * [`meld()`](docs/api.md#adding-aspects) is now a function that adds aspects.
