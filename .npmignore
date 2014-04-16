@@ -1,0 +1,9 @@
+/docs/
+/experiments/
+/test/
+projectFilesBackup/
+.idea/
+.*
+*~
+bower.json
+*.md
