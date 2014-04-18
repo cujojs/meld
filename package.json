@@ -41,14 +41,14 @@
 		}
 	],
 	"devDependencies": {
-		"buster": "~0.6",
-		"jshint": "~1"
+		"buster": "~0.7",
+		"jshint": "~2"
 	},
 	"main": "meld",
 	"directories": {
 		"test": "test"
 	},
 	"scripts": {
-		"test": "jshint . && buster test -e node"
+		"test": "jshint . && buster-test -e node"
 	}
 }

@@ -1,10 +1,7 @@
 (function(buster, meld) {
 'use strict';
 
-var assert, refute;
-
-assert = buster.assert;
-refute = buster.refute;
+var assert = buster.assert;
 
 var arg = 'foo'; // const
 

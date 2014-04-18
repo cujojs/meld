@@ -1,13 +1,11 @@
 (function(buster, meld, createCache) {
 'use strict';
 
-var assert, refute, param, sentinel;
+var assert = buster.assert;
+var refute = buster.refute;
 
-assert = buster.assert;
-refute = buster.refute;
-
-param = { foo: 'bar' };
-sentinel = {};
+var param = { foo: 'bar' };
+var sentinel = {};
 
 function noop() {}
 

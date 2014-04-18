@@ -1,12 +1,10 @@
 (function(buster, meld, createTracer) {
 'use strict';
 
-var assert, refute, sentinel;
+var assert = buster.assert;
+var refute = buster.refute;
 
-assert = buster.assert;
-refute = buster.refute;
-
-sentinel = {};
+var sentinel = {};
 
 buster.testCase('aspect/trace', {
 

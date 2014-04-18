@@ -1,11 +1,9 @@
 (function(buster, meld) {
 
-var assert, refute, arg;
+var assert = buster.assert;
+var refute = buster.refute;
 
-assert = buster.assert;
-refute = buster.refute;
-
-arg = {};
+var arg = {};
 function method() {}
 
 // Test fixture
