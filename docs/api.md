@@ -116,6 +116,8 @@ var remover = meld.afterReturning(object, match, afterReturningFunction);
 
 Adds afterReturning advice to matching methods.  The `afterReturningFunction` will be called after the matching method returns successfully (i.e. does not throw), and will receive the return value as its only argument.
 
+AfterReturning advice *cannot* modify the return value of advised functions.  If you need to modify the return value, use [around advice](#meldaround).  If afterReturning advice throws an exception, it will be propagated.
+
 **NOTE:** afterReturning advice *will not* be executed when the matching method throws.
 
 ```js
@@ -140,6 +142,8 @@ var remover = meld.afterThrowing(object, match, afterThrowingFunction);
 
 Adds afterThrowing advice to matching methods.  The `afterThrowingFunction` will be called after the matching method throws an exception, and will receive the thrown exception as its only argument.
 
+AfterThrowing advice *cannot* squelch exceptions.  That is, it cannot turn the "throwing" case back into "returning".  If you need to do that, use [around advice](#meldaround).  If afterThrowing advice throws an exception, however, it will be propagated in place of the original exception.
+
 **NOTE:** afterThrowing advice *will not* be executed when the matching method returns without throwing.
 
 ```js
@@ -162,6 +166,8 @@ var remover = meld.after(object, match, afterFunction);
 ```
 
 Adds after advice to matching methods.  The `afterFunction` will be called after the matching method returns successfully *or* throws an exception, and will receive either the return value or the thrown exception as its only argument.
+
+Like afterReturning and afterThrowing advices, after can neither squelch exceptions nor substitute a new return value.  If you need to do either of those things, use [around advice](#meldaround).  If after advice throws an exception, however, it will be propagated in place of the original exception.
 
 **NOTE:** after advice will *always* be executed.
 
