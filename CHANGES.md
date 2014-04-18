@@ -2,6 +2,7 @@
 
 * Added `bower.json`
 * Added a proper `npmignore` to install only what's needed.
+* Updated after advice docs with info about return values
 
 ### 1.3.0
 
