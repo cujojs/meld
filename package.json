@@ -10,12 +10,10 @@
 			"url": "http://www.opensource.org/licenses/mit-license.php"
 		}
 	],
-	"repositories": [
-		{
-			"type": "git",
-			"url": "https://github.com/cujojs/meld"
-		}
-	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cujojs/meld"
+	},
 	"bugs": "https://github.com/cujojs/meld/issues",
 	"maintainers": [
 		{
