@@ -1,3 +1,7 @@
+### 1.3.2
+
+* * Update `package.json` to use `"repository"` to avoid npm warnings.
+
 ### 1.3.1
 
 * Added `bower.json`
