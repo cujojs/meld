@@ -13,8 +13,17 @@
  * @author John Hann
  * @version 1.3.1
  */
-(function (define) {
-define(function () {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+         define(factory);
+    }
+    else if (typeof exports === 'object') {
+        module.exports = factory();
+    }
+    else {
+        root.meld = factory();
+    }
+})(this, function () {
 
 	//
 	// Public API
@@ -594,5 +603,3 @@ define(function () {
 	return meld;
 
 });
-})(typeof define == 'function' && define.amd ? define : function (factory) { module.exports = factory(); }
-);
