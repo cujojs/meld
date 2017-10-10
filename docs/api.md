@@ -68,6 +68,10 @@ joinpoint = {
 	
 	// Name of the original method
 	method: String,
+	
+	// UUID to trace a single method invocation
+	uuid: String, 
+	
 
 	// When, called, causes the original method to be invoked
 	// When called without arguments, the original arguments will

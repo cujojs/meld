@@ -117,6 +117,7 @@ A joinpoint has the following properties:
 * target - context with which the original method was called
 * method - String name of the method that was called
 * args - Array of arguments that were passed to the method
+* uuid - UUID for tracing a single method invocation
 
 ## Accessing the Joinpoint
 
