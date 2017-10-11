@@ -1,3 +1,7 @@
+### 1.3.3
+
+* Added joinpoint UUID for tracing a single method invocation. 
+
 ### 1.3.2
 
 * * Update `package.json` to use `"repository"` to avoid npm warnings.

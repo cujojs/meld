@@ -107,6 +107,33 @@ buster.testCase('joinpoint', {
 			assert.equals(meldJoinpoint.args, expected);
 		}
 
+	},
+
+	'should identify advised function stack': function() {
+		var target, expected;
+
+		target = {
+			method: function() {}
+		};
+
+		expected = [1, 2, 3];
+
+		meld.before(target, 'method', verifyJoinpoint);
+		meld.on(target, 'method', verifyJoinpoint);
+		meld.afterReturning(target, 'method', verifyJoinpoint);
+		meld.after(target, 'method', verifyJoinpoint);
+
+		target.method.apply(target, expected);
+
+		refute.defined(meld.joinpoint());
+
+		function verifyJoinpoint() {
+			var jp = meld.joinpoint();
+			assert.equals(jp.target, target);
+			assert.equals(jp.method, 'method');
+			assert.equals(jp.args, expected);
+			assert.defined(jp.uuid);
+		}
 	}
 
 });
