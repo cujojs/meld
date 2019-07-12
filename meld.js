@@ -400,18 +400,19 @@ define(function () {
 
 	function addAspectToMatches(target, pointcut, aspect) {
 		var removers = [];
+
+		let propertyNames = Object.getOwnPropertyNames(target.__proto__)
 		// Assume the pointcut is a an object with a .test() method
-		for (var p in target) {
-			// TODO: Decide whether hasOwnProperty is correct here
-			// Only apply to own properties that are functions, and match the pointcut regexp
-			if (typeof target[p] == 'function' && pointcut.test(p)) {
-				// if(object.hasOwnProperty(p) && typeof object[p] === 'function' && pointcut.test(p)) {
-				removers.push(addAspectToMethod(target, p, aspect));
-			}
+		for (var p of propertyNames) {
+				let isFunction = typeof target[p] == 'function'
+				let isMatched = pointcut.test(p)
+				if (isFunction && isMatched) {
+						removers.push(addAspectToMethod(target, p, aspect));
+				}
 		}
 
 		return createRemover(removers);
-	}
+}
 
 	function createRemover(removers) {
 		return {
